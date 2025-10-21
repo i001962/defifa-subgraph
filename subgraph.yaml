@@ -1,15 +1,15 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
-description: 0.1.1
+description: 0.2.0
 dataSources:
   - kind: ethereum
     name: DefifaDeployer
-    network: goerli
+    network: sepolia
     source:
       abi: DefifaDeployer
-      address: "0x17cABd6BC8679954476961c73b88f5888F8FF708"
-      startBlock: 9082549
+      address: "0x27Ec3a2AB3e4710cFF7D44ca047770f17cAe428e"
+      startBlock: 6000000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -20,13 +20,21 @@ dataSources:
         - name: DefifaDeployer
           file: ./abis/DefifaDeployer.json
       eventHandlers:
-        - event: LaunchGame(indexed uint256,indexed address,indexed address,address,address)
+        - event: LaunchGame(uint256 indexed gameId,address indexed delegate,address indexed governor,address tokenUriResolver,address caller)
           handler: handleLaunchGame
+        - event: QueuedRefundPhase(uint256 indexed gameId,address caller)
+          handler: handleQueuedRefundPhase
+        - event: QueuedScoringPhase(uint256 indexed gameId,address caller)
+          handler: handleQueuedScoringPhase
+        - event: QueuedNoContest(uint256 indexed gameId,address caller)
+          handler: handleQueuedNoContest
+        - event: FulfilledCommitments(uint256 indexed gameId,uint256 pot,address caller)
+          handler: handleFulfilledCommitments
       file: ./src/mappings/defifa-deployer.ts
 templates:
   - name: DefifaNFT
     kind: ethereum/contract
-    network: goerli
+    network: sepolia
     source:
       abi: DefifaNFT
     mapping:
@@ -46,11 +54,17 @@ templates:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
+        - event: Mint(uint256 indexed tokenId,uint256 indexed tierId,address indexed beneficiary,uint256 totalAmountContributed,address caller)
+          handler: handleMint
+        - event: MintReservedToken(uint256 indexed tokenId,uint256 indexed tierId,address indexed beneficiary,address caller)
+          handler: handleMintReservedToken
+        - event: TierDelegateAttestationsChanged(address indexed delegate,uint256 indexed tierId,uint256 previousBalance,uint256 newBalance,address caller)
+          handler: handleTierDelegateAttestationsChanged
   - name: Governor
     kind: ethereum/contract
-    network: goerli
+    network: sepolia
     source:
-      abi: Governor
+      abi: DefifaGovernor
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -59,24 +73,20 @@ templates:
       entities:
         - Governor
       abis:
-        - name: Governor
-          file: ./abis/IGovernorTimelock.json
+        - name: DefifaGovernor
+          file: ./abis/DefifaGovernor.json
       eventHandlers:
-        - event: ProposalCanceled(uint256)
-          handler: handleProposalCanceled
-        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
-          handler: handleProposalCreated
-        - event: ProposalExecuted(uint256)
-          handler: handleProposalExecuted
-        - event: ProposalQueued(uint256,uint256)
-          handler: handleProposalQueued
-        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
-          handler: handleVoteCast
-        - event: VoteCastWithParams(indexed address,uint256,uint8,uint256,string,bytes)
-          handler: handleVoteCastWithParams
+        - event: GameInitialized(uint256 indexed gameId,uint256 attestationStartTime,uint256 attestationGracePeriod,address caller)
+          handler: handleGameInitialized
+        - event: ScorecardSubmitted(uint256 indexed gameId,uint256 indexed scorecardId,tuple[],bool,address caller)
+          handler: handleScorecardSubmitted
+        - event: ScorecardAttested(uint256 indexed gameId,uint256 indexed scorecardId,uint256 weight,address caller)
+          handler: handleScorecardAttested
+        - event: ScorecardRatified(uint256 indexed gameId,uint256 indexed scorecardId,address caller)
+          handler: handleScorecardRatified
   - name: TokenMetadata
     kind: file/ipfs
-    network: goerli
+    network: sepolia
     mapping:
       apiVersion: 0.0.7
       language: wasm/assemblyscript

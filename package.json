@@ -1,19 +1,18 @@
 {
-  "name": "defifa-goerli",
+  "name": "defifa-sepolia",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ defifa-goerli",
-    "create-local": "graph create --node http://localhost:8020/ defifa-goerli",
-    "remove-local": "graph remove --node http://localhost:8020/ defifa-goerli",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 defifa-goerli"
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ defifa-sepolia",
+    "create-local": "graph create --node http://localhost:8020/ defifa-sepolia",
+    "remove-local": "graph remove --node http://localhost:8020/ defifa-sepolia",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 defifa-sepolia"
   },
   "dependencies": {
-    "": "^@graphprotocol/graph-ts0.29.3",
     "@amxx/graphprotocol-utils": "^1.1.0",
-    "@graphprotocol/graph-cli": "^0.49.0",
-    "@graphprotocol/graph-ts": "^0.30.0",
+    "@graphprotocol/graph-cli": "^0.82.0",
+    "@graphprotocol/graph-ts": "^0.32.0",
     "as-base64": "^0.2.0"
   }
 }

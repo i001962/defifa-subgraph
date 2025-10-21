@@ -4,51 +4,20 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "indexed": true,
         "internalType": "uint256",
-        "name": "tokenId",
+        "name": "gameId",
         "type": "uint256"
-      }
-    ],
-    "name": "Transfer",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tierId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "beneficiary",
-        "type": "address"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "totalAmountContributed",
+        "name": "attestationStartTime",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "attestationGracePeriod",
         "type": "uint256"
       },
       {
@@ -58,7 +27,7 @@
         "type": "address"
       }
     ],
-    "name": "Mint",
+    "name": "GameInitialized",
     "type": "event"
   },
   {
@@ -67,20 +36,26 @@
       {
         "indexed": true,
         "internalType": "uint256",
-        "name": "tokenId",
+        "name": "gameId",
         "type": "uint256"
       },
       {
         "indexed": true,
         "internalType": "uint256",
-        "name": "tierId",
+        "name": "scorecardId",
         "type": "uint256"
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "beneficiary",
-        "type": "address"
+        "indexed": false,
+        "internalType": "tuple[]",
+        "name": "tierWeights",
+        "type": "tuple[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isDefaultAttestationDelegate",
+        "type": "bool"
       },
       {
         "indexed": false,
@@ -89,7 +64,7 @@
         "type": "address"
       }
     ],
-    "name": "MintReservedToken",
+    "name": "ScorecardSubmitted",
     "type": "event"
   },
   {
@@ -97,26 +72,20 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "address",
-        "name": "delegate",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "gameId",
+        "type": "uint256"
       },
       {
         "indexed": true,
         "internalType": "uint256",
-        "name": "tierId",
+        "name": "scorecardId",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "previousBalance",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "newBalance",
+        "name": "weight",
         "type": "uint256"
       },
       {
@@ -126,7 +95,32 @@
         "type": "address"
       }
     ],
-    "name": "TierDelegateAttestationsChanged",
+    "name": "ScorecardAttested",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "gameId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "scorecardId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "caller",
+        "type": "address"
+      }
+    ],
+    "name": "ScorecardRatified",
     "type": "event"
   }
 ]
