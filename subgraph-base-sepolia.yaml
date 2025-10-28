@@ -9,7 +9,7 @@ dataSources:
     source:
       abi: DefifaDeployer
       address: "0xaa1c5d7bee4cc88523286774dffeab26687ec0ff"
-      startBlock: 208641575
+      startBlock: 1000000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -26,14 +26,6 @@ dataSources:
       eventHandlers:
         - event: LaunchGame(indexed uint256,indexed address,indexed address,address,address)
           handler: handleLaunchGame
-        - event: QueuedRefundPhase(indexed uint256,address)
-          handler: handleQueuedRefundPhase
-        - event: QueuedScoringPhase(indexed uint256,address)
-          handler: handleQueuedScoringPhase
-        - event: QueuedNoContest(indexed uint256,address)
-          handler: handleQueuedNoContest
-        - event: FulfilledCommitments(indexed uint256,uint256,address)
-          handler: handleFulfilledCommitments
       file: ./src/mappings/defifa-deployer.ts
 
 templates:
@@ -57,12 +49,6 @@ templates:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-        - event: Mint(indexed uint256,indexed uint256,indexed address,uint256,address)
-          handler: handleMint
-        - event: MintReservedToken(indexed uint256,indexed uint256,indexed address,address)
-          handler: handleMintReservedToken
-        - event: TierDelegateAttestationsChanged(indexed address,indexed uint256,uint256,uint256,address)
-          handler: handleTierDelegateAttestationsChanged
       file: ./src/mappings/defifa-nft.ts
 
   - kind: ethereum
@@ -84,8 +70,5 @@ templates:
       eventHandlers:
         - event: ScorecardSubmitted(indexed uint256,indexed uint256,(uint256,uint256)[],bool,address)
           handler: handleScorecardSubmitted
-        - event: ScorecardAttested(indexed uint256,indexed uint256,uint256,address)
-          handler: handleScorecardAttested
-        - event: ScorecardRatified(indexed uint256,indexed uint256,address)
-          handler: handleScorecardRatified
       file: ./src/mappings/governor.ts
+

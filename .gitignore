@@ -20,6 +20,9 @@ hardhat.config.js
 # production
 /build
 
+# generated code
+/generated
+
 # misc
 .DS_Store
 *.pem

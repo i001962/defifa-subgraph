@@ -63,6 +63,7 @@ type DefifaTierRedemptionWeight @entity(immutable: true) {
 type Scorecard @entity(immutable: false) {
   id: ID!
   gameId: ID!
+  scorecardId: BigInt!
   submitter: Account!
   tierWeights: [DefifaTierRedemptionWeight!]! @derivedFrom(field: "scorecard")
 }
