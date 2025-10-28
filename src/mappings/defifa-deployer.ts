@@ -1,5 +1,11 @@
 import { BigInt, DataSourceContext } from "@graphprotocol/graph-ts"
-import { LaunchGame as LaunchGameEvent } from "../../generated/DefifaDeployer/DefifaDeployer"
+import { 
+  LaunchGame as LaunchGameEvent,
+  QueuedRefundPhase as QueuedRefundPhaseEvent,
+  QueuedScoringPhase as QueuedScoringPhaseEvent,
+  QueuedNoContest as QueuedNoContestEvent,
+  FulfilledCommitments as FulfilledCommitmentsEvent
+} from "../../generated/DefifaDeployer/DefifaDeployer"
 import {
   Contract as ContractEntity,
   Governor,
@@ -24,7 +30,7 @@ export function handleLaunchGame(event: LaunchGameEvent): void {
   let governorContract = new Governor(governor)
   let governorAccount = new Account(governor)
 
-  // let instance = DefifaNFT.bind(event.params.delegate)
+  let instance = DefifaNFT.bind(event.params.delegate)
 
   contract.address = delegate
   contract.gameId = gameId
@@ -33,14 +39,14 @@ export function handleLaunchGame(event: LaunchGameEvent): void {
   contract.tokenUriResolver = tokenUriResolver
   contract.totalSupply = BigInt.fromI32(0)
 
-  // let name = instance.try_name()
-  // if (!name.reverted) {
-  //   contract.name = name.value
-  // }
-  // let symbol = instance.try_symbol()
-  // if (!symbol.reverted) {
-  //   contract.symbol = symbol.value
-  // }
+  let name = instance.try_name()
+  if (!name.reverted) {
+    contract.name = name.value
+  }
+  let symbol = instance.try_symbol()
+  if (!symbol.reverted) {
+    contract.symbol = symbol.value
+  }
 
   contract.save()
 
@@ -62,4 +68,24 @@ export function handleLaunchGame(event: LaunchGameEvent): void {
   let governorContext = new DataSourceContext()
   governorContext.setBigInt("gameId", gameId)
   GovernorInstance.createWithContext(governor, governorContext)
+}
+
+export function handleQueuedRefundPhase(event: QueuedRefundPhaseEvent): void {
+  // TODO: Implement handler for QueuedRefundPhase event
+  // For now, this is a stub to allow the subgraph to compile
+}
+
+export function handleQueuedScoringPhase(event: QueuedScoringPhaseEvent): void {
+  // TODO: Implement handler for QueuedScoringPhase event
+  // For now, this is a stub to allow the subgraph to compile
+}
+
+export function handleQueuedNoContest(event: QueuedNoContestEvent): void {
+  // TODO: Implement handler for QueuedNoContest event
+  // For now, this is a stub to allow the subgraph to compile
+}
+
+export function handleFulfilledCommitments(event: FulfilledCommitmentsEvent): void {
+  // TODO: Implement handler for FulfilledCommitments event
+  // For now, this is a stub to allow the subgraph to compile
 }

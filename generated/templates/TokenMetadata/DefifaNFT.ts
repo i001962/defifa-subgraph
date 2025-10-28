@@ -7,78 +7,8 @@ import {
   Entity,
   Bytes,
   Address,
-  BigInt
+  BigInt,
 } from "@graphprotocol/graph-ts";
-
-export class AddTier extends ethereum.Event {
-  get params(): AddTier__Params {
-    return new AddTier__Params(this);
-  }
-}
-
-export class AddTier__Params {
-  _event: AddTier;
-
-  constructor(event: AddTier) {
-    this._event = event;
-  }
-
-  get tierId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-
-  get data(): AddTierDataStruct {
-    return changetype<AddTierDataStruct>(
-      this._event.parameters[1].value.toTuple()
-    );
-  }
-
-  get caller(): Address {
-    return this._event.parameters[2].value.toAddress();
-  }
-}
-
-export class AddTierDataStruct extends ethereum.Tuple {
-  get contributionFloor(): BigInt {
-    return this[0].toBigInt();
-  }
-
-  get lockedUntil(): BigInt {
-    return this[1].toBigInt();
-  }
-
-  get initialQuantity(): BigInt {
-    return this[2].toBigInt();
-  }
-
-  get votingUnits(): i32 {
-    return this[3].toI32();
-  }
-
-  get reservedRate(): i32 {
-    return this[4].toI32();
-  }
-
-  get reservedTokenBeneficiary(): Address {
-    return this[5].toAddress();
-  }
-
-  get encodedIPFSUri(): Bytes {
-    return this[6].toBytes();
-  }
-
-  get allowManualMint(): boolean {
-    return this[7].toBoolean();
-  }
-
-  get shouldUseBeneficiaryAsDefault(): boolean {
-    return this[8].toBoolean();
-  }
-
-  get transfersPausable(): boolean {
-    return this[9].toBoolean();
-  }
-}
 
 export class Approval extends ethereum.Event {
   get params(): Approval__Params {
@@ -129,6 +59,36 @@ export class ApprovalForAll__Params {
 
   get approved(): boolean {
     return this._event.parameters[2].value.toBoolean();
+  }
+}
+
+export class ClaimedTokens extends ethereum.Event {
+  get params(): ClaimedTokens__Params {
+    return new ClaimedTokens__Params(this);
+  }
+}
+
+export class ClaimedTokens__Params {
+  _event: ClaimedTokens;
+
+  constructor(event: ClaimedTokens) {
+    this._event = event;
+  }
+
+  get beneficiary(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get defifaTokenAmount(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+
+  get baseProtocolTokenAmount(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
+  }
+
+  get caller(): Address {
+    return this._event.parameters[3].value.toAddress();
   }
 }
 
@@ -244,21 +204,21 @@ export class OwnershipTransferred__Params {
   }
 }
 
-export class RemoveTier extends ethereum.Event {
-  get params(): RemoveTier__Params {
-    return new RemoveTier__Params(this);
+export class TierCashOutWeightsSet extends ethereum.Event {
+  get params(): TierCashOutWeightsSet__Params {
+    return new TierCashOutWeightsSet__Params(this);
   }
 }
 
-export class RemoveTier__Params {
-  _event: RemoveTier;
+export class TierCashOutWeightsSet__Params {
+  _event: TierCashOutWeightsSet;
 
-  constructor(event: RemoveTier) {
+  constructor(event: TierCashOutWeightsSet) {
     this._event = event;
   }
 
-  get tierId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
+  get _tierWeights(): Array<TierCashOutWeightsSet_tierWeightsStruct> {
+    return this._event.parameters[0].value.toTupleArray<TierCashOutWeightsSet_tierWeightsStruct>();
   }
 
   get caller(): Address {
@@ -266,138 +226,26 @@ export class RemoveTier__Params {
   }
 }
 
-export class SetBaseUri extends ethereum.Event {
-  get params(): SetBaseUri__Params {
-    return new SetBaseUri__Params(this);
+export class TierCashOutWeightsSet_tierWeightsStruct extends ethereum.Tuple {
+  get id(): BigInt {
+    return this[0].toBigInt();
+  }
+
+  get cashOutWeight(): BigInt {
+    return this[1].toBigInt();
   }
 }
 
-export class SetBaseUri__Params {
-  _event: SetBaseUri;
-
-  constructor(event: SetBaseUri) {
-    this._event = event;
-  }
-
-  get baseUri(): Bytes {
-    return this._event.parameters[0].value.toBytes();
-  }
-
-  get caller(): Address {
-    return this._event.parameters[1].value.toAddress();
+export class TierDelegateAttestationsChanged extends ethereum.Event {
+  get params(): TierDelegateAttestationsChanged__Params {
+    return new TierDelegateAttestationsChanged__Params(this);
   }
 }
 
-export class SetContractUri extends ethereum.Event {
-  get params(): SetContractUri__Params {
-    return new SetContractUri__Params(this);
-  }
-}
+export class TierDelegateAttestationsChanged__Params {
+  _event: TierDelegateAttestationsChanged;
 
-export class SetContractUri__Params {
-  _event: SetContractUri;
-
-  constructor(event: SetContractUri) {
-    this._event = event;
-  }
-
-  get contractUri(): Bytes {
-    return this._event.parameters[0].value.toBytes();
-  }
-
-  get caller(): Address {
-    return this._event.parameters[1].value.toAddress();
-  }
-}
-
-export class SetDefaultReservedTokenBeneficiary extends ethereum.Event {
-  get params(): SetDefaultReservedTokenBeneficiary__Params {
-    return new SetDefaultReservedTokenBeneficiary__Params(this);
-  }
-}
-
-export class SetDefaultReservedTokenBeneficiary__Params {
-  _event: SetDefaultReservedTokenBeneficiary;
-
-  constructor(event: SetDefaultReservedTokenBeneficiary) {
-    this._event = event;
-  }
-
-  get beneficiary(): Address {
-    return this._event.parameters[0].value.toAddress();
-  }
-
-  get caller(): Address {
-    return this._event.parameters[1].value.toAddress();
-  }
-}
-
-export class SetTokenUriResolver extends ethereum.Event {
-  get params(): SetTokenUriResolver__Params {
-    return new SetTokenUriResolver__Params(this);
-  }
-}
-
-export class SetTokenUriResolver__Params {
-  _event: SetTokenUriResolver;
-
-  constructor(event: SetTokenUriResolver) {
-    this._event = event;
-  }
-
-  get newResolver(): Address {
-    return this._event.parameters[0].value.toAddress();
-  }
-
-  get caller(): Address {
-    return this._event.parameters[1].value.toAddress();
-  }
-}
-
-export class TierDelegateChanged extends ethereum.Event {
-  get params(): TierDelegateChanged__Params {
-    return new TierDelegateChanged__Params(this);
-  }
-}
-
-export class TierDelegateChanged__Params {
-  _event: TierDelegateChanged;
-
-  constructor(event: TierDelegateChanged) {
-    this._event = event;
-  }
-
-  get delegator(): Address {
-    return this._event.parameters[0].value.toAddress();
-  }
-
-  get fromDelegate(): Address {
-    return this._event.parameters[1].value.toAddress();
-  }
-
-  get toDelegate(): Address {
-    return this._event.parameters[2].value.toAddress();
-  }
-
-  get tierId(): BigInt {
-    return this._event.parameters[3].value.toBigInt();
-  }
-
-  get caller(): Address {
-    return this._event.parameters[4].value.toAddress();
-  }
-}
-
-export class TierDelegateVotesChanged extends ethereum.Event {
-  get params(): TierDelegateVotesChanged__Params {
-    return new TierDelegateVotesChanged__Params(this);
-  }
-}
-
-export class TierDelegateVotesChanged__Params {
-  _event: TierDelegateVotesChanged;
-
-  constructor(event: TierDelegateVotesChanged) {
+  constructor(event: TierDelegateAttestationsChanged) {
     this._event = event;
   }
 
@@ -417,7 +265,7 @@ export class TierDelegateVotesChanged__Params {
     return this._event.parameters[3].value.toBigInt();
   }
 
-  get callre(): Address {
+  get caller(): Address {
     return this._event.parameters[4].value.toAddress();
   }
 }
@@ -448,165 +296,65 @@ export class Transfer__Params {
   }
 }
 
-export class DefifaNFT__payParamsResultDelegateAllocationsStruct extends ethereum.Tuple {
-  get delegate(): Address {
+export class DefifaNFT__beforeCashOutRecordedWithResultHookSpecificationsStruct extends ethereum.Tuple {
+  get hook(): Address {
     return this[0].toAddress();
   }
 
   get amount(): BigInt {
     return this[1].toBigInt();
-  }
-}
-
-export class DefifaNFT__payParamsResult {
-  value0: BigInt;
-  value1: string;
-  value2: Array<DefifaNFT__payParamsResultDelegateAllocationsStruct>;
-
-  constructor(
-    value0: BigInt,
-    value1: string,
-    value2: Array<DefifaNFT__payParamsResultDelegateAllocationsStruct>
-  ) {
-    this.value0 = value0;
-    this.value1 = value1;
-    this.value2 = value2;
-  }
-
-  toMap(): TypedMap<string, ethereum.Value> {
-    let map = new TypedMap<string, ethereum.Value>();
-    map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
-    map.set("value1", ethereum.Value.fromString(this.value1));
-    map.set("value2", ethereum.Value.fromTupleArray(this.value2));
-    return map;
-  }
-
-  getWeight(): BigInt {
-    return this.value0;
-  }
-
-  getMemo(): string {
-    return this.value1;
-  }
-
-  getDelegateAllocations(): Array<
-    DefifaNFT__payParamsResultDelegateAllocationsStruct
-  > {
-    return this.value2;
-  }
-}
-
-export class DefifaNFT__payParamsInput_dataStruct extends ethereum.Tuple {
-  get terminal(): Address {
-    return this[0].toAddress();
-  }
-
-  get payer(): Address {
-    return this[1].toAddress();
-  }
-
-  get amount(): DefifaNFT__payParamsInput_dataAmountStruct {
-    return changetype<DefifaNFT__payParamsInput_dataAmountStruct>(
-      this[2].toTuple()
-    );
-  }
-
-  get projectId(): BigInt {
-    return this[3].toBigInt();
-  }
-
-  get currentFundingCycleConfiguration(): BigInt {
-    return this[4].toBigInt();
-  }
-
-  get beneficiary(): Address {
-    return this[5].toAddress();
-  }
-
-  get weight(): BigInt {
-    return this[6].toBigInt();
-  }
-
-  get reservedRate(): BigInt {
-    return this[7].toBigInt();
-  }
-
-  get memo(): string {
-    return this[8].toString();
   }
 
   get metadata(): Bytes {
-    return this[9].toBytes();
+    return this[2].toBytes();
   }
 }
 
-export class DefifaNFT__payParamsInput_dataAmountStruct extends ethereum.Tuple {
-  get token(): Address {
-    return this[0].toAddress();
-  }
-
-  get value(): BigInt {
-    return this[1].toBigInt();
-  }
-
-  get decimals(): BigInt {
-    return this[2].toBigInt();
-  }
-
-  get currency(): BigInt {
-    return this[3].toBigInt();
-  }
-}
-
-export class DefifaNFT__redeemParamsResultDelegateAllocationsStruct extends ethereum.Tuple {
-  get delegate(): Address {
-    return this[0].toAddress();
-  }
-
-  get amount(): BigInt {
-    return this[1].toBigInt();
-  }
-}
-
-export class DefifaNFT__redeemParamsResult {
+export class DefifaNFT__beforeCashOutRecordedWithResult {
   value0: BigInt;
-  value1: string;
-  value2: Array<DefifaNFT__redeemParamsResultDelegateAllocationsStruct>;
+  value1: BigInt;
+  value2: BigInt;
+  value3: Array<DefifaNFT__beforeCashOutRecordedWithResultHookSpecificationsStruct>;
 
   constructor(
     value0: BigInt,
-    value1: string,
-    value2: Array<DefifaNFT__redeemParamsResultDelegateAllocationsStruct>
+    value1: BigInt,
+    value2: BigInt,
+    value3: Array<DefifaNFT__beforeCashOutRecordedWithResultHookSpecificationsStruct>,
   ) {
     this.value0 = value0;
     this.value1 = value1;
     this.value2 = value2;
+    this.value3 = value3;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
     let map = new TypedMap<string, ethereum.Value>();
     map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
-    map.set("value1", ethereum.Value.fromString(this.value1));
-    map.set("value2", ethereum.Value.fromTupleArray(this.value2));
+    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
+    map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
+    map.set("value3", ethereum.Value.fromTupleArray(this.value3));
     return map;
   }
 
-  getReclaimAmount(): BigInt {
+  getCashOutTaxRate(): BigInt {
     return this.value0;
   }
 
-  getMemo(): string {
+  getCashOutCount(): BigInt {
     return this.value1;
   }
 
-  getDelegateAllocations(): Array<
-    DefifaNFT__redeemParamsResultDelegateAllocationsStruct
-  > {
+  getTotalSupply(): BigInt {
     return this.value2;
+  }
+
+  getHookSpecifications(): Array<DefifaNFT__beforeCashOutRecordedWithResultHookSpecificationsStruct> {
+    return this.value3;
   }
 }
 
-export class DefifaNFT__redeemParamsInput_dataStruct extends ethereum.Tuple {
+export class DefifaNFT__beforeCashOutRecordedWithInputContextStruct extends ethereum.Tuple {
   get terminal(): Address {
     return this[0].toAddress();
   }
@@ -619,11 +367,11 @@ export class DefifaNFT__redeemParamsInput_dataStruct extends ethereum.Tuple {
     return this[2].toBigInt();
   }
 
-  get currentFundingCycleConfiguration(): BigInt {
+  get rulesetId(): BigInt {
     return this[3].toBigInt();
   }
 
-  get tokenCount(): BigInt {
+  get cashOutCount(): BigInt {
     return this[4].toBigInt();
   }
 
@@ -631,47 +379,351 @@ export class DefifaNFT__redeemParamsInput_dataStruct extends ethereum.Tuple {
     return this[5].toBigInt();
   }
 
-  get overflow(): BigInt {
-    return this[6].toBigInt();
-  }
-
-  get reclaimAmount(): DefifaNFT__redeemParamsInput_dataReclaimAmountStruct {
-    return changetype<DefifaNFT__redeemParamsInput_dataReclaimAmountStruct>(
-      this[7].toTuple()
+  get surplus(): DefifaNFT__beforeCashOutRecordedWithInputContextSurplusStruct {
+    return changetype<DefifaNFT__beforeCashOutRecordedWithInputContextSurplusStruct>(
+      this[6].toTuple(),
     );
   }
 
-  get useTotalOverflow(): boolean {
-    return this[8].toBoolean();
+  get useTotalSurplus(): boolean {
+    return this[7].toBoolean();
   }
 
-  get redemptionRate(): BigInt {
-    return this[9].toBigInt();
-  }
-
-  get memo(): string {
-    return this[10].toString();
+  get cashOutTaxRate(): BigInt {
+    return this[8].toBigInt();
   }
 
   get metadata(): Bytes {
-    return this[11].toBytes();
+    return this[9].toBytes();
   }
 }
 
-export class DefifaNFT__redeemParamsInput_dataReclaimAmountStruct extends ethereum.Tuple {
+export class DefifaNFT__beforeCashOutRecordedWithInputContextSurplusStruct extends ethereum.Tuple {
   get token(): Address {
     return this[0].toAddress();
   }
 
-  get value(): BigInt {
-    return this[1].toBigInt();
-  }
-
-  get decimals(): BigInt {
-    return this[2].toBigInt();
+  get decimals(): i32 {
+    return this[1].toI32();
   }
 
   get currency(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get value(): BigInt {
+    return this[3].toBigInt();
+  }
+}
+
+export class DefifaNFT__beforePayRecordedWithResultHookSpecificationsStruct extends ethereum.Tuple {
+  get hook(): Address {
+    return this[0].toAddress();
+  }
+
+  get amount(): BigInt {
+    return this[1].toBigInt();
+  }
+
+  get metadata(): Bytes {
+    return this[2].toBytes();
+  }
+}
+
+export class DefifaNFT__beforePayRecordedWithResult {
+  value0: BigInt;
+  value1: Array<DefifaNFT__beforePayRecordedWithResultHookSpecificationsStruct>;
+
+  constructor(
+    value0: BigInt,
+    value1: Array<DefifaNFT__beforePayRecordedWithResultHookSpecificationsStruct>,
+  ) {
+    this.value0 = value0;
+    this.value1 = value1;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
+    map.set("value1", ethereum.Value.fromTupleArray(this.value1));
+    return map;
+  }
+
+  getWeight(): BigInt {
+    return this.value0;
+  }
+
+  getHookSpecifications(): Array<DefifaNFT__beforePayRecordedWithResultHookSpecificationsStruct> {
+    return this.value1;
+  }
+}
+
+export class DefifaNFT__beforePayRecordedWithInputContextStruct extends ethereum.Tuple {
+  get terminal(): Address {
+    return this[0].toAddress();
+  }
+
+  get payer(): Address {
+    return this[1].toAddress();
+  }
+
+  get amount(): DefifaNFT__beforePayRecordedWithInputContextAmountStruct {
+    return changetype<DefifaNFT__beforePayRecordedWithInputContextAmountStruct>(
+      this[2].toTuple(),
+    );
+  }
+
+  get projectId(): BigInt {
+    return this[3].toBigInt();
+  }
+
+  get rulesetId(): BigInt {
+    return this[4].toBigInt();
+  }
+
+  get beneficiary(): Address {
+    return this[5].toAddress();
+  }
+
+  get weight(): BigInt {
+    return this[6].toBigInt();
+  }
+
+  get reservedPercent(): BigInt {
+    return this[7].toBigInt();
+  }
+
+  get metadata(): Bytes {
+    return this[8].toBytes();
+  }
+}
+
+export class DefifaNFT__beforePayRecordedWithInputContextAmountStruct extends ethereum.Tuple {
+  get token(): Address {
+    return this[0].toAddress();
+  }
+
+  get decimals(): i32 {
+    return this[1].toI32();
+  }
+
+  get currency(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get value(): BigInt {
+    return this[3].toBigInt();
+  }
+}
+
+export class DefifaNFT__cashOutWeightOf1InputParam1Struct extends ethereum.Tuple {
+  get terminal(): Address {
+    return this[0].toAddress();
+  }
+
+  get holder(): Address {
+    return this[1].toAddress();
+  }
+
+  get projectId(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get rulesetId(): BigInt {
+    return this[3].toBigInt();
+  }
+
+  get cashOutCount(): BigInt {
+    return this[4].toBigInt();
+  }
+
+  get totalSupply(): BigInt {
+    return this[5].toBigInt();
+  }
+
+  get surplus(): DefifaNFT__cashOutWeightOf1InputParam1SurplusStruct {
+    return changetype<DefifaNFT__cashOutWeightOf1InputParam1SurplusStruct>(
+      this[6].toTuple(),
+    );
+  }
+
+  get useTotalSurplus(): boolean {
+    return this[7].toBoolean();
+  }
+
+  get cashOutTaxRate(): BigInt {
+    return this[8].toBigInt();
+  }
+
+  get metadata(): Bytes {
+    return this[9].toBytes();
+  }
+}
+
+export class DefifaNFT__cashOutWeightOf1InputParam1SurplusStruct extends ethereum.Tuple {
+  get token(): Address {
+    return this[0].toAddress();
+  }
+
+  get decimals(): i32 {
+    return this[1].toI32();
+  }
+
+  get currency(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get value(): BigInt {
+    return this[3].toBigInt();
+  }
+}
+
+export class DefifaNFT__hasMintPermissionForInputParam1Struct extends ethereum.Tuple {
+  get cycleNumber(): BigInt {
+    return this[0].toBigInt();
+  }
+
+  get id(): BigInt {
+    return this[1].toBigInt();
+  }
+
+  get basedOnId(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get start(): BigInt {
+    return this[3].toBigInt();
+  }
+
+  get duration(): BigInt {
+    return this[4].toBigInt();
+  }
+
+  get weight(): BigInt {
+    return this[5].toBigInt();
+  }
+
+  get weightCutPercent(): BigInt {
+    return this[6].toBigInt();
+  }
+
+  get approvalHook(): Address {
+    return this[7].toAddress();
+  }
+
+  get metadata(): BigInt {
+    return this[8].toBigInt();
+  }
+}
+
+export class DefifaNFT__tokenAllocationsResult {
+  value0: BigInt;
+  value1: BigInt;
+
+  constructor(value0: BigInt, value1: BigInt) {
+    this.value0 = value0;
+    this.value1 = value1;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
+    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
+    return map;
+  }
+
+  getDefifaTokenAllocation(): BigInt {
+    return this.value0;
+  }
+
+  getBaseProtocolTokenAllocation(): BigInt {
+    return this.value1;
+  }
+}
+
+export class DefifaNFT__tokensClaimableForResult {
+  value0: BigInt;
+  value1: BigInt;
+
+  constructor(value0: BigInt, value1: BigInt) {
+    this.value0 = value0;
+    this.value1 = value1;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
+    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
+    return map;
+  }
+
+  getDefifaTokenAmount(): BigInt {
+    return this.value0;
+  }
+
+  getBaseProtocolTokenAmount(): BigInt {
+    return this.value1;
+  }
+}
+
+export class DefifaNFT__totalCashOutWeightInputParam0Struct extends ethereum.Tuple {
+  get terminal(): Address {
+    return this[0].toAddress();
+  }
+
+  get holder(): Address {
+    return this[1].toAddress();
+  }
+
+  get projectId(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get rulesetId(): BigInt {
+    return this[3].toBigInt();
+  }
+
+  get cashOutCount(): BigInt {
+    return this[4].toBigInt();
+  }
+
+  get totalSupply(): BigInt {
+    return this[5].toBigInt();
+  }
+
+  get surplus(): DefifaNFT__totalCashOutWeightInputParam0SurplusStruct {
+    return changetype<DefifaNFT__totalCashOutWeightInputParam0SurplusStruct>(
+      this[6].toTuple(),
+    );
+  }
+
+  get useTotalSurplus(): boolean {
+    return this[7].toBoolean();
+  }
+
+  get cashOutTaxRate(): BigInt {
+    return this[8].toBigInt();
+  }
+
+  get metadata(): Bytes {
+    return this[9].toBytes();
+  }
+}
+
+export class DefifaNFT__totalCashOutWeightInputParam0SurplusStruct extends ethereum.Tuple {
+  get token(): Address {
+    return this[0].toAddress();
+  }
+
+  get decimals(): i32 {
+    return this[1].toI32();
+  }
+
+  get currency(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get value(): BigInt {
     return this[3].toBigInt();
   }
 }
@@ -681,41 +733,52 @@ export class DefifaNFT extends ethereum.SmartContract {
     return new DefifaNFT("DefifaNFT", address);
   }
 
-  END_GAME_PHASE(): BigInt {
-    let result = super.call("END_GAME_PHASE", "END_GAME_PHASE():(uint256)", []);
+  DIRECTORY(): Address {
+    let result = super.call("DIRECTORY", "DIRECTORY():(address)", []);
 
-    return result[0].toBigInt();
+    return result[0].toAddress();
   }
 
-  try_END_GAME_PHASE(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "END_GAME_PHASE",
-      "END_GAME_PHASE():(uint256)",
-      []
-    );
+  try_DIRECTORY(): ethereum.CallResult<Address> {
+    let result = super.tryCall("DIRECTORY", "DIRECTORY():(address)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
+    return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  MINT_GAME_PHASE(): BigInt {
+  METADATA_ID_TARGET(): Address {
     let result = super.call(
-      "MINT_GAME_PHASE",
-      "MINT_GAME_PHASE():(uint256)",
-      []
+      "METADATA_ID_TARGET",
+      "METADATA_ID_TARGET():(address)",
+      [],
     );
+
+    return result[0].toAddress();
+  }
+
+  try_METADATA_ID_TARGET(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "METADATA_ID_TARGET",
+      "METADATA_ID_TARGET():(address)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  PROJECT_ID(): BigInt {
+    let result = super.call("PROJECT_ID", "PROJECT_ID():(uint256)", []);
 
     return result[0].toBigInt();
   }
 
-  try_MINT_GAME_PHASE(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "MINT_GAME_PHASE",
-      "MINT_GAME_PHASE():(uint256)",
-      []
-    );
+  try_PROJECT_ID(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("PROJECT_ID", "PROJECT_ID():(uint256)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -723,21 +786,21 @@ export class DefifaNFT extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  TOTAL_REDEMPTION_WEIGHT(): BigInt {
+  TOTAL_CASHOUT_WEIGHT(): BigInt {
     let result = super.call(
-      "TOTAL_REDEMPTION_WEIGHT",
-      "TOTAL_REDEMPTION_WEIGHT():(uint256)",
-      []
+      "TOTAL_CASHOUT_WEIGHT",
+      "TOTAL_CASHOUT_WEIGHT():(uint256)",
+      [],
     );
 
     return result[0].toBigInt();
   }
 
-  try_TOTAL_REDEMPTION_WEIGHT(): ethereum.CallResult<BigInt> {
+  try_TOTAL_CASHOUT_WEIGHT(): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "TOTAL_REDEMPTION_WEIGHT",
-      "TOTAL_REDEMPTION_WEIGHT():(uint256)",
-      []
+      "TOTAL_CASHOUT_WEIGHT",
+      "TOTAL_CASHOUT_WEIGHT():(uint256)",
+      [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -746,18 +809,230 @@ export class DefifaNFT extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  balanceOf(_owner: Address): BigInt {
+  amountRedeemed(): BigInt {
+    let result = super.call("amountRedeemed", "amountRedeemed():(uint256)", []);
+
+    return result[0].toBigInt();
+  }
+
+  try_amountRedeemed(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "amountRedeemed",
+      "amountRedeemed():(uint256)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  balanceOf(owner: Address): BigInt {
     let result = super.call("balanceOf", "balanceOf(address):(uint256)", [
-      ethereum.Value.fromAddress(_owner)
+      ethereum.Value.fromAddress(owner),
     ]);
 
     return result[0].toBigInt();
   }
 
-  try_balanceOf(_owner: Address): ethereum.CallResult<BigInt> {
+  try_balanceOf(owner: Address): ethereum.CallResult<BigInt> {
     let result = super.tryCall("balanceOf", "balanceOf(address):(uint256)", [
-      ethereum.Value.fromAddress(_owner)
+      ethereum.Value.fromAddress(owner),
     ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  baseProtocolToken(): Address {
+    let result = super.call(
+      "baseProtocolToken",
+      "baseProtocolToken():(address)",
+      [],
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_baseProtocolToken(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "baseProtocolToken",
+      "baseProtocolToken():(address)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  baseURI(): string {
+    let result = super.call("baseURI", "baseURI():(string)", []);
+
+    return result[0].toString();
+  }
+
+  try_baseURI(): ethereum.CallResult<string> {
+    let result = super.tryCall("baseURI", "baseURI():(string)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
+  beforeCashOutRecordedWith(
+    context: DefifaNFT__beforeCashOutRecordedWithInputContextStruct,
+  ): DefifaNFT__beforeCashOutRecordedWithResult {
+    let result = super.call(
+      "beforeCashOutRecordedWith",
+      "beforeCashOutRecordedWith((address,address,uint256,uint256,uint256,uint256,(address,uint8,uint32,uint256),bool,uint256,bytes)):(uint256,uint256,uint256,(address,uint256,bytes)[])",
+      [ethereum.Value.fromTuple(context)],
+    );
+
+    return new DefifaNFT__beforeCashOutRecordedWithResult(
+      result[0].toBigInt(),
+      result[1].toBigInt(),
+      result[2].toBigInt(),
+      result[3].toTupleArray<DefifaNFT__beforeCashOutRecordedWithResultHookSpecificationsStruct>(),
+    );
+  }
+
+  try_beforeCashOutRecordedWith(
+    context: DefifaNFT__beforeCashOutRecordedWithInputContextStruct,
+  ): ethereum.CallResult<DefifaNFT__beforeCashOutRecordedWithResult> {
+    let result = super.tryCall(
+      "beforeCashOutRecordedWith",
+      "beforeCashOutRecordedWith((address,address,uint256,uint256,uint256,uint256,(address,uint8,uint32,uint256),bool,uint256,bytes)):(uint256,uint256,uint256,(address,uint256,bytes)[])",
+      [ethereum.Value.fromTuple(context)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new DefifaNFT__beforeCashOutRecordedWithResult(
+        value[0].toBigInt(),
+        value[1].toBigInt(),
+        value[2].toBigInt(),
+        value[3].toTupleArray<DefifaNFT__beforeCashOutRecordedWithResultHookSpecificationsStruct>(),
+      ),
+    );
+  }
+
+  beforePayRecordedWith(
+    context: DefifaNFT__beforePayRecordedWithInputContextStruct,
+  ): DefifaNFT__beforePayRecordedWithResult {
+    let result = super.call(
+      "beforePayRecordedWith",
+      "beforePayRecordedWith((address,address,(address,uint8,uint32,uint256),uint256,uint256,address,uint256,uint256,bytes)):(uint256,(address,uint256,bytes)[])",
+      [ethereum.Value.fromTuple(context)],
+    );
+
+    return new DefifaNFT__beforePayRecordedWithResult(
+      result[0].toBigInt(),
+      result[1].toTupleArray<DefifaNFT__beforePayRecordedWithResultHookSpecificationsStruct>(),
+    );
+  }
+
+  try_beforePayRecordedWith(
+    context: DefifaNFT__beforePayRecordedWithInputContextStruct,
+  ): ethereum.CallResult<DefifaNFT__beforePayRecordedWithResult> {
+    let result = super.tryCall(
+      "beforePayRecordedWith",
+      "beforePayRecordedWith((address,address,(address,uint8,uint32,uint256),uint256,uint256,address,uint256,uint256,bytes)):(uint256,(address,uint256,bytes)[])",
+      [ethereum.Value.fromTuple(context)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new DefifaNFT__beforePayRecordedWithResult(
+        value[0].toBigInt(),
+        value[1].toTupleArray<DefifaNFT__beforePayRecordedWithResultHookSpecificationsStruct>(),
+      ),
+    );
+  }
+
+  cashOutWeightIsSet(): boolean {
+    let result = super.call(
+      "cashOutWeightIsSet",
+      "cashOutWeightIsSet():(bool)",
+      [],
+    );
+
+    return result[0].toBoolean();
+  }
+
+  try_cashOutWeightIsSet(): ethereum.CallResult<boolean> {
+    let result = super.tryCall(
+      "cashOutWeightIsSet",
+      "cashOutWeightIsSet():(bool)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  cashOutWeightOf(_tokenId: BigInt): BigInt {
+    let result = super.call(
+      "cashOutWeightOf",
+      "cashOutWeightOf(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_tokenId)],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_cashOutWeightOf(_tokenId: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "cashOutWeightOf",
+      "cashOutWeightOf(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_tokenId)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  cashOutWeightOf1(
+    tokenIds: Array<BigInt>,
+    param1: DefifaNFT__cashOutWeightOf1InputParam1Struct,
+  ): BigInt {
+    let result = super.call(
+      "cashOutWeightOf",
+      "cashOutWeightOf(uint256[],(address,address,uint256,uint256,uint256,uint256,(address,uint8,uint32,uint256),bool,uint256,bytes)):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigIntArray(tokenIds),
+        ethereum.Value.fromTuple(param1),
+      ],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_cashOutWeightOf1(
+    tokenIds: Array<BigInt>,
+    param1: DefifaNFT__cashOutWeightOf1InputParam1Struct,
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "cashOutWeightOf",
+      "cashOutWeightOf(uint256[],(address,address,uint256,uint256,uint256,uint256,(address,uint8,uint32,uint256),bool,uint256,bytes)):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigIntArray(tokenIds),
+        ethereum.Value.fromTuple(param1),
+      ],
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -795,18 +1070,22 @@ export class DefifaNFT extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toString());
   }
 
-  creditsOf(param0: Address): BigInt {
-    let result = super.call("creditsOf", "creditsOf(address):(uint256)", [
-      ethereum.Value.fromAddress(param0)
-    ]);
+  currentSupplyOfTier(_tierId: BigInt): BigInt {
+    let result = super.call(
+      "currentSupplyOfTier",
+      "currentSupplyOfTier(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_tierId)],
+    );
 
     return result[0].toBigInt();
   }
 
-  try_creditsOf(param0: Address): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("creditsOf", "creditsOf(address):(uint256)", [
-      ethereum.Value.fromAddress(param0)
-    ]);
+  try_currentSupplyOfTier(_tierId: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "currentSupplyOfTier",
+      "currentSupplyOfTier(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_tierId)],
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -814,14 +1093,37 @@ export class DefifaNFT extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  directory(): Address {
-    let result = super.call("directory", "directory():(address)", []);
+  defaultAttestationDelegate(): Address {
+    let result = super.call(
+      "defaultAttestationDelegate",
+      "defaultAttestationDelegate():(address)",
+      [],
+    );
 
     return result[0].toAddress();
   }
 
-  try_directory(): ethereum.CallResult<Address> {
-    let result = super.tryCall("directory", "directory():(address)", []);
+  try_defaultAttestationDelegate(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "defaultAttestationDelegate",
+      "defaultAttestationDelegate():(address)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  defifaToken(): Address {
+    let result = super.call("defifaToken", "defifaToken():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_defifaToken(): ethereum.CallResult<Address> {
+    let result = super.tryCall("defifaToken", "defifaToken():(address)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -831,7 +1133,7 @@ export class DefifaNFT extends ethereum.SmartContract {
 
   firstOwnerOf(_tokenId: BigInt): Address {
     let result = super.call("firstOwnerOf", "firstOwnerOf(uint256):(address)", [
-      ethereum.Value.fromUnsignedBigInt(_tokenId)
+      ethereum.Value.fromUnsignedBigInt(_tokenId),
     ]);
 
     return result[0].toAddress();
@@ -841,7 +1143,7 @@ export class DefifaNFT extends ethereum.SmartContract {
     let result = super.tryCall(
       "firstOwnerOf",
       "firstOwnerOf(uint256):(address)",
-      [ethereum.Value.fromUnsignedBigInt(_tokenId)]
+      [ethereum.Value.fromUnsignedBigInt(_tokenId)],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -850,21 +1152,44 @@ export class DefifaNFT extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  fundingCycleStore(): Address {
+  gamePhaseReporter(): Address {
     let result = super.call(
-      "fundingCycleStore",
-      "fundingCycleStore():(address)",
-      []
+      "gamePhaseReporter",
+      "gamePhaseReporter():(address)",
+      [],
     );
 
     return result[0].toAddress();
   }
 
-  try_fundingCycleStore(): ethereum.CallResult<Address> {
+  try_gamePhaseReporter(): ethereum.CallResult<Address> {
     let result = super.tryCall(
-      "fundingCycleStore",
-      "fundingCycleStore():(address)",
-      []
+      "gamePhaseReporter",
+      "gamePhaseReporter():(address)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  gamePotReporter(): Address {
+    let result = super.call(
+      "gamePotReporter",
+      "gamePotReporter():(address)",
+      [],
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_gamePotReporter(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "gamePotReporter",
+      "gamePotReporter():(address)",
+      [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -875,7 +1200,7 @@ export class DefifaNFT extends ethereum.SmartContract {
 
   getApproved(tokenId: BigInt): Address {
     let result = super.call("getApproved", "getApproved(uint256):(address)", [
-      ethereum.Value.fromUnsignedBigInt(tokenId)
+      ethereum.Value.fromUnsignedBigInt(tokenId),
     ]);
 
     return result[0].toAddress();
@@ -885,7 +1210,7 @@ export class DefifaNFT extends ethereum.SmartContract {
     let result = super.tryCall(
       "getApproved",
       "getApproved(uint256):(address)",
-      [ethereum.Value.fromUnsignedBigInt(tokenId)]
+      [ethereum.Value.fromUnsignedBigInt(tokenId)],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -894,69 +1219,37 @@ export class DefifaNFT extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  getPastTierTotalVotes(_tier: BigInt, _blockNumber: BigInt): BigInt {
-    let result = super.call(
-      "getPastTierTotalVotes",
-      "getPastTierTotalVotes(uint256,uint256):(uint256)",
-      [
-        ethereum.Value.fromUnsignedBigInt(_tier),
-        ethereum.Value.fromUnsignedBigInt(_blockNumber)
-      ]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_getPastTierTotalVotes(
-    _tier: BigInt,
-    _blockNumber: BigInt
-  ): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "getPastTierTotalVotes",
-      "getPastTierTotalVotes(uint256,uint256):(uint256)",
-      [
-        ethereum.Value.fromUnsignedBigInt(_tier),
-        ethereum.Value.fromUnsignedBigInt(_blockNumber)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  getPastTierVotes(
+  getPastTierAttestationUnitsOf(
     _account: Address,
     _tier: BigInt,
-    _blockNumber: BigInt
+    _timestamp: BigInt,
   ): BigInt {
     let result = super.call(
-      "getPastTierVotes",
-      "getPastTierVotes(address,uint256,uint256):(uint256)",
+      "getPastTierAttestationUnitsOf",
+      "getPastTierAttestationUnitsOf(address,uint256,uint48):(uint256)",
       [
         ethereum.Value.fromAddress(_account),
         ethereum.Value.fromUnsignedBigInt(_tier),
-        ethereum.Value.fromUnsignedBigInt(_blockNumber)
-      ]
+        ethereum.Value.fromUnsignedBigInt(_timestamp),
+      ],
     );
 
     return result[0].toBigInt();
   }
 
-  try_getPastTierVotes(
+  try_getPastTierAttestationUnitsOf(
     _account: Address,
     _tier: BigInt,
-    _blockNumber: BigInt
+    _timestamp: BigInt,
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "getPastTierVotes",
-      "getPastTierVotes(address,uint256,uint256):(uint256)",
+      "getPastTierAttestationUnitsOf",
+      "getPastTierAttestationUnitsOf(address,uint256,uint48):(uint256)",
       [
         ethereum.Value.fromAddress(_account),
         ethereum.Value.fromUnsignedBigInt(_tier),
-        ethereum.Value.fromUnsignedBigInt(_blockNumber)
-      ]
+        ethereum.Value.fromUnsignedBigInt(_timestamp),
+      ],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -965,30 +1258,97 @@ export class DefifaNFT extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  getTierDelegate(_account: Address, _tier: BigInt): Address {
+  getPastTierTotalAttestationUnitsOf(
+    _tier: BigInt,
+    _timestamp: BigInt,
+  ): BigInt {
     let result = super.call(
-      "getTierDelegate",
-      "getTierDelegate(address,uint256):(address)",
+      "getPastTierTotalAttestationUnitsOf",
+      "getPastTierTotalAttestationUnitsOf(uint256,uint48):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_tier),
+        ethereum.Value.fromUnsignedBigInt(_timestamp),
+      ],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_getPastTierTotalAttestationUnitsOf(
+    _tier: BigInt,
+    _timestamp: BigInt,
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "getPastTierTotalAttestationUnitsOf",
+      "getPastTierTotalAttestationUnitsOf(uint256,uint48):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_tier),
+        ethereum.Value.fromUnsignedBigInt(_timestamp),
+      ],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  getTierAttestationUnitsOf(_account: Address, _tier: BigInt): BigInt {
+    let result = super.call(
+      "getTierAttestationUnitsOf",
+      "getTierAttestationUnitsOf(address,uint256):(uint256)",
       [
         ethereum.Value.fromAddress(_account),
-        ethereum.Value.fromUnsignedBigInt(_tier)
-      ]
+        ethereum.Value.fromUnsignedBigInt(_tier),
+      ],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_getTierAttestationUnitsOf(
+    _account: Address,
+    _tier: BigInt,
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "getTierAttestationUnitsOf",
+      "getTierAttestationUnitsOf(address,uint256):(uint256)",
+      [
+        ethereum.Value.fromAddress(_account),
+        ethereum.Value.fromUnsignedBigInt(_tier),
+      ],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  getTierDelegateOf(_account: Address, _tier: BigInt): Address {
+    let result = super.call(
+      "getTierDelegateOf",
+      "getTierDelegateOf(address,uint256):(address)",
+      [
+        ethereum.Value.fromAddress(_account),
+        ethereum.Value.fromUnsignedBigInt(_tier),
+      ],
     );
 
     return result[0].toAddress();
   }
 
-  try_getTierDelegate(
+  try_getTierDelegateOf(
     _account: Address,
-    _tier: BigInt
+    _tier: BigInt,
   ): ethereum.CallResult<Address> {
     let result = super.tryCall(
-      "getTierDelegate",
-      "getTierDelegate(address,uint256):(address)",
+      "getTierDelegateOf",
+      "getTierDelegateOf(address,uint256):(address)",
       [
         ethereum.Value.fromAddress(_account),
-        ethereum.Value.fromUnsignedBigInt(_tier)
-      ]
+        ethereum.Value.fromUnsignedBigInt(_tier),
+      ],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -997,53 +1357,23 @@ export class DefifaNFT extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  getTierTotalVotes(_tier: BigInt): BigInt {
+  getTierTotalAttestationUnitsOf(_tier: BigInt): BigInt {
     let result = super.call(
-      "getTierTotalVotes",
-      "getTierTotalVotes(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_tier)]
+      "getTierTotalAttestationUnitsOf",
+      "getTierTotalAttestationUnitsOf(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_tier)],
     );
 
     return result[0].toBigInt();
   }
 
-  try_getTierTotalVotes(_tier: BigInt): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "getTierTotalVotes",
-      "getTierTotalVotes(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_tier)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  getTierVotes(_account: Address, _tier: BigInt): BigInt {
-    let result = super.call(
-      "getTierVotes",
-      "getTierVotes(address,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(_account),
-        ethereum.Value.fromUnsignedBigInt(_tier)
-      ]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_getTierVotes(
-    _account: Address,
-    _tier: BigInt
+  try_getTierTotalAttestationUnitsOf(
+    _tier: BigInt,
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "getTierVotes",
-      "getTierVotes(address,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(_account),
-        ethereum.Value.fromUnsignedBigInt(_tier)
-      ]
+      "getTierTotalAttestationUnitsOf",
+      "getTierTotalAttestationUnitsOf(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_tier)],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -1052,24 +1382,37 @@ export class DefifaNFT extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  isApprovedForAll(owner: Address, operator: Address): boolean {
+  hasMintPermissionFor(
+    param0: BigInt,
+    param1: DefifaNFT__hasMintPermissionForInputParam1Struct,
+    param2: Address,
+  ): boolean {
     let result = super.call(
-      "isApprovedForAll",
-      "isApprovedForAll(address,address):(bool)",
-      [ethereum.Value.fromAddress(owner), ethereum.Value.fromAddress(operator)]
+      "hasMintPermissionFor",
+      "hasMintPermissionFor(uint256,(uint48,uint48,uint48,uint48,uint32,uint112,uint32,address,uint256),address):(bool)",
+      [
+        ethereum.Value.fromUnsignedBigInt(param0),
+        ethereum.Value.fromTuple(param1),
+        ethereum.Value.fromAddress(param2),
+      ],
     );
 
     return result[0].toBoolean();
   }
 
-  try_isApprovedForAll(
-    owner: Address,
-    operator: Address
+  try_hasMintPermissionFor(
+    param0: BigInt,
+    param1: DefifaNFT__hasMintPermissionForInputParam1Struct,
+    param2: Address,
   ): ethereum.CallResult<boolean> {
     let result = super.tryCall(
-      "isApprovedForAll",
-      "isApprovedForAll(address,address):(bool)",
-      [ethereum.Value.fromAddress(owner), ethereum.Value.fromAddress(operator)]
+      "hasMintPermissionFor",
+      "hasMintPermissionFor(uint256,(uint48,uint48,uint48,uint48,uint32,uint112,uint32,address,uint256),address):(bool)",
+      [
+        ethereum.Value.fromUnsignedBigInt(param0),
+        ethereum.Value.fromTuple(param1),
+        ethereum.Value.fromAddress(param2),
+      ],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -1078,36 +1421,30 @@ export class DefifaNFT extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  mintFor(_tierIds: Array<i32>, _beneficiary: Address): Array<BigInt> {
+  isApprovedForAll(owner: Address, operator: Address): boolean {
     let result = super.call(
-      "mintFor",
-      "mintFor(uint16[],address):(uint256[])",
-      [
-        ethereum.Value.fromI32Array(_tierIds),
-        ethereum.Value.fromAddress(_beneficiary)
-      ]
+      "isApprovedForAll",
+      "isApprovedForAll(address,address):(bool)",
+      [ethereum.Value.fromAddress(owner), ethereum.Value.fromAddress(operator)],
     );
 
-    return result[0].toBigIntArray();
+    return result[0].toBoolean();
   }
 
-  try_mintFor(
-    _tierIds: Array<i32>,
-    _beneficiary: Address
-  ): ethereum.CallResult<Array<BigInt>> {
+  try_isApprovedForAll(
+    owner: Address,
+    operator: Address,
+  ): ethereum.CallResult<boolean> {
     let result = super.tryCall(
-      "mintFor",
-      "mintFor(uint16[],address):(uint256[])",
-      [
-        ethereum.Value.fromI32Array(_tierIds),
-        ethereum.Value.fromAddress(_beneficiary)
-      ]
+      "isApprovedForAll",
+      "isApprovedForAll(address,address):(bool)",
+      [ethereum.Value.fromAddress(owner), ethereum.Value.fromAddress(operator)],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigIntArray());
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
   name(): string {
@@ -1142,7 +1479,7 @@ export class DefifaNFT extends ethereum.SmartContract {
 
   ownerOf(tokenId: BigInt): Address {
     let result = super.call("ownerOf", "ownerOf(uint256):(address)", [
-      ethereum.Value.fromUnsignedBigInt(tokenId)
+      ethereum.Value.fromUnsignedBigInt(tokenId),
     ]);
 
     return result[0].toAddress();
@@ -1150,64 +1487,8 @@ export class DefifaNFT extends ethereum.SmartContract {
 
   try_ownerOf(tokenId: BigInt): ethereum.CallResult<Address> {
     let result = super.tryCall("ownerOf", "ownerOf(uint256):(address)", [
-      ethereum.Value.fromUnsignedBigInt(tokenId)
+      ethereum.Value.fromUnsignedBigInt(tokenId),
     ]);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  payParams(
-    _data: DefifaNFT__payParamsInput_dataStruct
-  ): DefifaNFT__payParamsResult {
-    let result = super.call(
-      "payParams",
-      "payParams((address,address,(address,uint256,uint256,uint256),uint256,uint256,address,uint256,uint256,string,bytes)):(uint256,string,(address,uint256)[])",
-      [ethereum.Value.fromTuple(_data)]
-    );
-
-    return new DefifaNFT__payParamsResult(
-      result[0].toBigInt(),
-      result[1].toString(),
-      result[2].toTupleArray<
-        DefifaNFT__payParamsResultDelegateAllocationsStruct
-      >()
-    );
-  }
-
-  try_payParams(
-    _data: DefifaNFT__payParamsInput_dataStruct
-  ): ethereum.CallResult<DefifaNFT__payParamsResult> {
-    let result = super.tryCall(
-      "payParams",
-      "payParams((address,address,(address,uint256,uint256,uint256),uint256,uint256,address,uint256,uint256,string,bytes)):(uint256,string,(address,uint256)[])",
-      [ethereum.Value.fromTuple(_data)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(
-      new DefifaNFT__payParamsResult(
-        value[0].toBigInt(),
-        value[1].toString(),
-        value[2].toTupleArray<
-          DefifaNFT__payParamsResultDelegateAllocationsStruct
-        >()
-      )
-    );
-  }
-
-  prices(): Address {
-    let result = super.call("prices", "prices():(address)", []);
-
-    return result[0].toAddress();
-  }
-
-  try_prices(): ethereum.CallResult<Address> {
-    let result = super.tryCall("prices", "prices():(address)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -1219,7 +1500,7 @@ export class DefifaNFT extends ethereum.SmartContract {
     let result = super.call(
       "pricingCurrency",
       "pricingCurrency():(uint256)",
-      []
+      [],
     );
 
     return result[0].toBigInt();
@@ -1229,7 +1510,7 @@ export class DefifaNFT extends ethereum.SmartContract {
     let result = super.tryCall(
       "pricingCurrency",
       "pricingCurrency():(uint256)",
-      []
+      [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -1238,83 +1519,19 @@ export class DefifaNFT extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  pricingDecimals(): BigInt {
-    let result = super.call(
-      "pricingDecimals",
-      "pricingDecimals():(uint256)",
-      []
-    );
+  rulesets(): Address {
+    let result = super.call("rulesets", "rulesets():(address)", []);
 
-    return result[0].toBigInt();
+    return result[0].toAddress();
   }
 
-  try_pricingDecimals(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "pricingDecimals",
-      "pricingDecimals():(uint256)",
-      []
-    );
+  try_rulesets(): ethereum.CallResult<Address> {
+    let result = super.tryCall("rulesets", "rulesets():(address)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  projectId(): BigInt {
-    let result = super.call("projectId", "projectId():(uint256)", []);
-
-    return result[0].toBigInt();
-  }
-
-  try_projectId(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("projectId", "projectId():(uint256)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  redeemParams(
-    _data: DefifaNFT__redeemParamsInput_dataStruct
-  ): DefifaNFT__redeemParamsResult {
-    let result = super.call(
-      "redeemParams",
-      "redeemParams((address,address,uint256,uint256,uint256,uint256,uint256,(address,uint256,uint256,uint256),bool,uint256,string,bytes)):(uint256,string,(address,uint256)[])",
-      [ethereum.Value.fromTuple(_data)]
-    );
-
-    return new DefifaNFT__redeemParamsResult(
-      result[0].toBigInt(),
-      result[1].toString(),
-      result[2].toTupleArray<
-        DefifaNFT__redeemParamsResultDelegateAllocationsStruct
-      >()
-    );
-  }
-
-  try_redeemParams(
-    _data: DefifaNFT__redeemParamsInput_dataStruct
-  ): ethereum.CallResult<DefifaNFT__redeemParamsResult> {
-    let result = super.tryCall(
-      "redeemParams",
-      "redeemParams((address,address,uint256,uint256,uint256,uint256,uint256,(address,uint256,uint256,uint256),bool,uint256,string,bytes)):(uint256,string,(address,uint256)[])",
-      [ethereum.Value.fromTuple(_data)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(
-      new DefifaNFT__redeemParamsResult(
-        value[0].toBigInt(),
-        value[1].toString(),
-        value[2].toTupleArray<
-          DefifaNFT__redeemParamsResultDelegateAllocationsStruct
-        >()
-      )
-    );
+    return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
   store(): Address {
@@ -1336,7 +1553,7 @@ export class DefifaNFT extends ethereum.SmartContract {
     let result = super.call(
       "supportsInterface",
       "supportsInterface(bytes4):(bool)",
-      [ethereum.Value.fromFixedBytes(_interfaceId)]
+      [ethereum.Value.fromFixedBytes(_interfaceId)],
     );
 
     return result[0].toBoolean();
@@ -1346,7 +1563,7 @@ export class DefifaNFT extends ethereum.SmartContract {
     let result = super.tryCall(
       "supportsInterface",
       "supportsInterface(bytes4):(bool)",
-      [ethereum.Value.fromFixedBytes(_interfaceId)]
+      [ethereum.Value.fromFixedBytes(_interfaceId)],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -1370,21 +1587,21 @@ export class DefifaNFT extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toString());
   }
 
-  tierRedemptionWeights(): Array<BigInt> {
+  tierCashOutWeights(): Array<BigInt> {
     let result = super.call(
-      "tierRedemptionWeights",
-      "tierRedemptionWeights():(uint256[100])",
-      []
+      "tierCashOutWeights",
+      "tierCashOutWeights():(uint256[128])",
+      [],
     );
 
     return result[0].toBigIntArray();
   }
 
-  try_tierRedemptionWeights(): ethereum.CallResult<Array<BigInt>> {
+  try_tierCashOutWeights(): ethereum.CallResult<Array<BigInt>> {
     let result = super.tryCall(
-      "tierRedemptionWeights",
-      "tierRedemptionWeights():(uint256[100])",
-      []
+      "tierCashOutWeights",
+      "tierCashOutWeights():(uint256[128])",
+      [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -1393,17 +1610,17 @@ export class DefifaNFT extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigIntArray());
   }
 
-  tokenURI(_tokenId: BigInt): string {
-    let result = super.call("tokenURI", "tokenURI(uint256):(string)", [
-      ethereum.Value.fromUnsignedBigInt(_tokenId)
+  tierNameOf(_tierId: BigInt): string {
+    let result = super.call("tierNameOf", "tierNameOf(uint256):(string)", [
+      ethereum.Value.fromUnsignedBigInt(_tierId),
     ]);
 
     return result[0].toString();
   }
 
-  try_tokenURI(_tokenId: BigInt): ethereum.CallResult<string> {
-    let result = super.tryCall("tokenURI", "tokenURI(uint256):(string)", [
-      ethereum.Value.fromUnsignedBigInt(_tokenId)
+  try_tierNameOf(_tierId: BigInt): ethereum.CallResult<string> {
+    let result = super.tryCall("tierNameOf", "tierNameOf(uint256):(string)", [
+      ethereum.Value.fromUnsignedBigInt(_tierId),
     ]);
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -1411,83 +1628,406 @@ export class DefifaNFT extends ethereum.SmartContract {
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toString());
   }
-}
 
-export class AdjustTiersCall extends ethereum.Call {
-  get inputs(): AdjustTiersCall__Inputs {
-    return new AdjustTiersCall__Inputs(this);
+  tokenAllocations(): DefifaNFT__tokenAllocationsResult {
+    let result = super.call(
+      "tokenAllocations",
+      "tokenAllocations():(uint256,uint256)",
+      [],
+    );
+
+    return new DefifaNFT__tokenAllocationsResult(
+      result[0].toBigInt(),
+      result[1].toBigInt(),
+    );
   }
 
-  get outputs(): AdjustTiersCall__Outputs {
-    return new AdjustTiersCall__Outputs(this);
+  try_tokenAllocations(): ethereum.CallResult<DefifaNFT__tokenAllocationsResult> {
+    let result = super.tryCall(
+      "tokenAllocations",
+      "tokenAllocations():(uint256,uint256)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new DefifaNFT__tokenAllocationsResult(
+        value[0].toBigInt(),
+        value[1].toBigInt(),
+      ),
+    );
+  }
+
+  tokenURI(_tokenId: BigInt): string {
+    let result = super.call("tokenURI", "tokenURI(uint256):(string)", [
+      ethereum.Value.fromUnsignedBigInt(_tokenId),
+    ]);
+
+    return result[0].toString();
+  }
+
+  try_tokenURI(_tokenId: BigInt): ethereum.CallResult<string> {
+    let result = super.tryCall("tokenURI", "tokenURI(uint256):(string)", [
+      ethereum.Value.fromUnsignedBigInt(_tokenId),
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
+  tokensClaimableFor(
+    _tokenIds: Array<BigInt>,
+  ): DefifaNFT__tokensClaimableForResult {
+    let result = super.call(
+      "tokensClaimableFor",
+      "tokensClaimableFor(uint256[]):(uint256,uint256)",
+      [ethereum.Value.fromUnsignedBigIntArray(_tokenIds)],
+    );
+
+    return new DefifaNFT__tokensClaimableForResult(
+      result[0].toBigInt(),
+      result[1].toBigInt(),
+    );
+  }
+
+  try_tokensClaimableFor(
+    _tokenIds: Array<BigInt>,
+  ): ethereum.CallResult<DefifaNFT__tokensClaimableForResult> {
+    let result = super.tryCall(
+      "tokensClaimableFor",
+      "tokensClaimableFor(uint256[]):(uint256,uint256)",
+      [ethereum.Value.fromUnsignedBigIntArray(_tokenIds)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new DefifaNFT__tokensClaimableForResult(
+        value[0].toBigInt(),
+        value[1].toBigInt(),
+      ),
+    );
+  }
+
+  tokensRedeemedFrom(param0: BigInt): BigInt {
+    let result = super.call(
+      "tokensRedeemedFrom",
+      "tokensRedeemedFrom(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(param0)],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_tokensRedeemedFrom(param0: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "tokensRedeemedFrom",
+      "tokensRedeemedFrom(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(param0)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  totalCashOutWeight(
+    param0: DefifaNFT__totalCashOutWeightInputParam0Struct,
+  ): BigInt {
+    let result = super.call(
+      "totalCashOutWeight",
+      "totalCashOutWeight((address,address,uint256,uint256,uint256,uint256,(address,uint8,uint32,uint256),bool,uint256,bytes)):(uint256)",
+      [ethereum.Value.fromTuple(param0)],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_totalCashOutWeight(
+    param0: DefifaNFT__totalCashOutWeightInputParam0Struct,
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "totalCashOutWeight",
+      "totalCashOutWeight((address,address,uint256,uint256,uint256,uint256,(address,uint8,uint32,uint256),bool,uint256,bytes)):(uint256)",
+      [ethereum.Value.fromTuple(param0)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 }
 
-export class AdjustTiersCall__Inputs {
-  _call: AdjustTiersCall;
+export class ConstructorCall extends ethereum.Call {
+  get inputs(): ConstructorCall__Inputs {
+    return new ConstructorCall__Inputs(this);
+  }
 
-  constructor(call: AdjustTiersCall) {
+  get outputs(): ConstructorCall__Outputs {
+    return new ConstructorCall__Outputs(this);
+  }
+}
+
+export class ConstructorCall__Inputs {
+  _call: ConstructorCall;
+
+  constructor(call: ConstructorCall) {
     this._call = call;
   }
 
-  get _tiersToAdd(): Array<AdjustTiersCall_tiersToAddStruct> {
-    return this._call.inputValues[0].value.toTupleArray<
-      AdjustTiersCall_tiersToAddStruct
-    >();
+  get _directory(): Address {
+    return this._call.inputValues[0].value.toAddress();
   }
 
-  get _tierIdsToRemove(): Array<BigInt> {
-    return this._call.inputValues[1].value.toBigIntArray();
+  get _defifaToken(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get _baseProtocolToken(): Address {
+    return this._call.inputValues[2].value.toAddress();
   }
 }
 
-export class AdjustTiersCall__Outputs {
-  _call: AdjustTiersCall;
+export class ConstructorCall__Outputs {
+  _call: ConstructorCall;
 
-  constructor(call: AdjustTiersCall) {
+  constructor(call: ConstructorCall) {
     this._call = call;
   }
 }
 
-export class AdjustTiersCall_tiersToAddStruct extends ethereum.Tuple {
-  get contributionFloor(): BigInt {
-    return this[0].toBigInt();
+export class AfterCashOutRecordedWithCall extends ethereum.Call {
+  get inputs(): AfterCashOutRecordedWithCall__Inputs {
+    return new AfterCashOutRecordedWithCall__Inputs(this);
   }
 
-  get lockedUntil(): BigInt {
+  get outputs(): AfterCashOutRecordedWithCall__Outputs {
+    return new AfterCashOutRecordedWithCall__Outputs(this);
+  }
+}
+
+export class AfterCashOutRecordedWithCall__Inputs {
+  _call: AfterCashOutRecordedWithCall;
+
+  constructor(call: AfterCashOutRecordedWithCall) {
+    this._call = call;
+  }
+
+  get context(): AfterCashOutRecordedWithCallContextStruct {
+    return changetype<AfterCashOutRecordedWithCallContextStruct>(
+      this._call.inputValues[0].value.toTuple(),
+    );
+  }
+}
+
+export class AfterCashOutRecordedWithCall__Outputs {
+  _call: AfterCashOutRecordedWithCall;
+
+  constructor(call: AfterCashOutRecordedWithCall) {
+    this._call = call;
+  }
+}
+
+export class AfterCashOutRecordedWithCallContextStruct extends ethereum.Tuple {
+  get holder(): Address {
+    return this[0].toAddress();
+  }
+
+  get projectId(): BigInt {
     return this[1].toBigInt();
   }
 
-  get initialQuantity(): BigInt {
+  get rulesetId(): BigInt {
     return this[2].toBigInt();
   }
 
-  get votingUnits(): i32 {
-    return this[3].toI32();
+  get cashOutCount(): BigInt {
+    return this[3].toBigInt();
   }
 
-  get reservedRate(): i32 {
-    return this[4].toI32();
+  get reclaimedAmount(): AfterCashOutRecordedWithCallContextReclaimedAmountStruct {
+    return changetype<AfterCashOutRecordedWithCallContextReclaimedAmountStruct>(
+      this[4].toTuple(),
+    );
   }
 
-  get reservedTokenBeneficiary(): Address {
-    return this[5].toAddress();
+  get forwardedAmount(): AfterCashOutRecordedWithCallContextForwardedAmountStruct {
+    return changetype<AfterCashOutRecordedWithCallContextForwardedAmountStruct>(
+      this[5].toTuple(),
+    );
   }
 
-  get encodedIPFSUri(): Bytes {
-    return this[6].toBytes();
+  get cashOutTaxRate(): BigInt {
+    return this[6].toBigInt();
   }
 
-  get allowManualMint(): boolean {
-    return this[7].toBoolean();
+  get beneficiary(): Address {
+    return this[7].toAddress();
   }
 
-  get shouldUseBeneficiaryAsDefault(): boolean {
-    return this[8].toBoolean();
+  get hookMetadata(): Bytes {
+    return this[8].toBytes();
   }
 
-  get transfersPausable(): boolean {
-    return this[9].toBoolean();
+  get cashOutMetadata(): Bytes {
+    return this[9].toBytes();
+  }
+}
+
+export class AfterCashOutRecordedWithCallContextReclaimedAmountStruct extends ethereum.Tuple {
+  get token(): Address {
+    return this[0].toAddress();
+  }
+
+  get decimals(): i32 {
+    return this[1].toI32();
+  }
+
+  get currency(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get value(): BigInt {
+    return this[3].toBigInt();
+  }
+}
+
+export class AfterCashOutRecordedWithCallContextForwardedAmountStruct extends ethereum.Tuple {
+  get token(): Address {
+    return this[0].toAddress();
+  }
+
+  get decimals(): i32 {
+    return this[1].toI32();
+  }
+
+  get currency(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get value(): BigInt {
+    return this[3].toBigInt();
+  }
+}
+
+export class AfterPayRecordedWithCall extends ethereum.Call {
+  get inputs(): AfterPayRecordedWithCall__Inputs {
+    return new AfterPayRecordedWithCall__Inputs(this);
+  }
+
+  get outputs(): AfterPayRecordedWithCall__Outputs {
+    return new AfterPayRecordedWithCall__Outputs(this);
+  }
+}
+
+export class AfterPayRecordedWithCall__Inputs {
+  _call: AfterPayRecordedWithCall;
+
+  constructor(call: AfterPayRecordedWithCall) {
+    this._call = call;
+  }
+
+  get context(): AfterPayRecordedWithCallContextStruct {
+    return changetype<AfterPayRecordedWithCallContextStruct>(
+      this._call.inputValues[0].value.toTuple(),
+    );
+  }
+}
+
+export class AfterPayRecordedWithCall__Outputs {
+  _call: AfterPayRecordedWithCall;
+
+  constructor(call: AfterPayRecordedWithCall) {
+    this._call = call;
+  }
+}
+
+export class AfterPayRecordedWithCallContextStruct extends ethereum.Tuple {
+  get payer(): Address {
+    return this[0].toAddress();
+  }
+
+  get projectId(): BigInt {
+    return this[1].toBigInt();
+  }
+
+  get rulesetId(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get amount(): AfterPayRecordedWithCallContextAmountStruct {
+    return changetype<AfterPayRecordedWithCallContextAmountStruct>(
+      this[3].toTuple(),
+    );
+  }
+
+  get forwardedAmount(): AfterPayRecordedWithCallContextForwardedAmountStruct {
+    return changetype<AfterPayRecordedWithCallContextForwardedAmountStruct>(
+      this[4].toTuple(),
+    );
+  }
+
+  get weight(): BigInt {
+    return this[5].toBigInt();
+  }
+
+  get newlyIssuedTokenCount(): BigInt {
+    return this[6].toBigInt();
+  }
+
+  get beneficiary(): Address {
+    return this[7].toAddress();
+  }
+
+  get hookMetadata(): Bytes {
+    return this[8].toBytes();
+  }
+
+  get payerMetadata(): Bytes {
+    return this[9].toBytes();
+  }
+}
+
+export class AfterPayRecordedWithCallContextAmountStruct extends ethereum.Tuple {
+  get token(): Address {
+    return this[0].toAddress();
+  }
+
+  get decimals(): i32 {
+    return this[1].toI32();
+  }
+
+  get currency(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get value(): BigInt {
+    return this[3].toBigInt();
+  }
+}
+
+export class AfterPayRecordedWithCallContextForwardedAmountStruct extends ethereum.Tuple {
+  get token(): Address {
+    return this[0].toAddress();
+  }
+
+  get decimals(): i32 {
+    return this[1].toI32();
+  }
+
+  get currency(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get value(): BigInt {
+    return this[3].toBigInt();
   }
 }
 
@@ -1525,226 +2065,6 @@ export class ApproveCall__Outputs {
   }
 }
 
-export class DidPayCall extends ethereum.Call {
-  get inputs(): DidPayCall__Inputs {
-    return new DidPayCall__Inputs(this);
-  }
-
-  get outputs(): DidPayCall__Outputs {
-    return new DidPayCall__Outputs(this);
-  }
-}
-
-export class DidPayCall__Inputs {
-  _call: DidPayCall;
-
-  constructor(call: DidPayCall) {
-    this._call = call;
-  }
-
-  get _data(): DidPayCall_dataStruct {
-    return changetype<DidPayCall_dataStruct>(
-      this._call.inputValues[0].value.toTuple()
-    );
-  }
-}
-
-export class DidPayCall__Outputs {
-  _call: DidPayCall;
-
-  constructor(call: DidPayCall) {
-    this._call = call;
-  }
-}
-
-export class DidPayCall_dataStruct extends ethereum.Tuple {
-  get payer(): Address {
-    return this[0].toAddress();
-  }
-
-  get projectId(): BigInt {
-    return this[1].toBigInt();
-  }
-
-  get currentFundingCycleConfiguration(): BigInt {
-    return this[2].toBigInt();
-  }
-
-  get amount(): DidPayCall_dataAmountStruct {
-    return changetype<DidPayCall_dataAmountStruct>(this[3].toTuple());
-  }
-
-  get forwardedAmount(): DidPayCall_dataForwardedAmountStruct {
-    return changetype<DidPayCall_dataForwardedAmountStruct>(this[4].toTuple());
-  }
-
-  get projectTokenCount(): BigInt {
-    return this[5].toBigInt();
-  }
-
-  get beneficiary(): Address {
-    return this[6].toAddress();
-  }
-
-  get preferClaimedTokens(): boolean {
-    return this[7].toBoolean();
-  }
-
-  get memo(): string {
-    return this[8].toString();
-  }
-
-  get metadata(): Bytes {
-    return this[9].toBytes();
-  }
-}
-
-export class DidPayCall_dataAmountStruct extends ethereum.Tuple {
-  get token(): Address {
-    return this[0].toAddress();
-  }
-
-  get value(): BigInt {
-    return this[1].toBigInt();
-  }
-
-  get decimals(): BigInt {
-    return this[2].toBigInt();
-  }
-
-  get currency(): BigInt {
-    return this[3].toBigInt();
-  }
-}
-
-export class DidPayCall_dataForwardedAmountStruct extends ethereum.Tuple {
-  get token(): Address {
-    return this[0].toAddress();
-  }
-
-  get value(): BigInt {
-    return this[1].toBigInt();
-  }
-
-  get decimals(): BigInt {
-    return this[2].toBigInt();
-  }
-
-  get currency(): BigInt {
-    return this[3].toBigInt();
-  }
-}
-
-export class DidRedeemCall extends ethereum.Call {
-  get inputs(): DidRedeemCall__Inputs {
-    return new DidRedeemCall__Inputs(this);
-  }
-
-  get outputs(): DidRedeemCall__Outputs {
-    return new DidRedeemCall__Outputs(this);
-  }
-}
-
-export class DidRedeemCall__Inputs {
-  _call: DidRedeemCall;
-
-  constructor(call: DidRedeemCall) {
-    this._call = call;
-  }
-
-  get _data(): DidRedeemCall_dataStruct {
-    return changetype<DidRedeemCall_dataStruct>(
-      this._call.inputValues[0].value.toTuple()
-    );
-  }
-}
-
-export class DidRedeemCall__Outputs {
-  _call: DidRedeemCall;
-
-  constructor(call: DidRedeemCall) {
-    this._call = call;
-  }
-}
-
-export class DidRedeemCall_dataStruct extends ethereum.Tuple {
-  get holder(): Address {
-    return this[0].toAddress();
-  }
-
-  get projectId(): BigInt {
-    return this[1].toBigInt();
-  }
-
-  get currentFundingCycleConfiguration(): BigInt {
-    return this[2].toBigInt();
-  }
-
-  get projectTokenCount(): BigInt {
-    return this[3].toBigInt();
-  }
-
-  get reclaimedAmount(): DidRedeemCall_dataReclaimedAmountStruct {
-    return changetype<DidRedeemCall_dataReclaimedAmountStruct>(
-      this[4].toTuple()
-    );
-  }
-
-  get forwardedAmount(): DidRedeemCall_dataForwardedAmountStruct {
-    return changetype<DidRedeemCall_dataForwardedAmountStruct>(
-      this[5].toTuple()
-    );
-  }
-
-  get beneficiary(): Address {
-    return this[6].toAddress();
-  }
-
-  get memo(): string {
-    return this[7].toString();
-  }
-
-  get metadata(): Bytes {
-    return this[8].toBytes();
-  }
-}
-
-export class DidRedeemCall_dataReclaimedAmountStruct extends ethereum.Tuple {
-  get token(): Address {
-    return this[0].toAddress();
-  }
-
-  get value(): BigInt {
-    return this[1].toBigInt();
-  }
-
-  get decimals(): BigInt {
-    return this[2].toBigInt();
-  }
-
-  get currency(): BigInt {
-    return this[3].toBigInt();
-  }
-}
-
-export class DidRedeemCall_dataForwardedAmountStruct extends ethereum.Tuple {
-  get token(): Address {
-    return this[0].toAddress();
-  }
-
-  get value(): BigInt {
-    return this[1].toBigInt();
-  }
-
-  get decimals(): BigInt {
-    return this[2].toBigInt();
-  }
-
-  get currency(): BigInt {
-    return this[3].toBigInt();
-  }
-}
-
 export class InitializeCall extends ethereum.Call {
   get inputs(): InitializeCall__Inputs {
     return new InitializeCall__Inputs(this);
@@ -1762,52 +2082,60 @@ export class InitializeCall__Inputs {
     this._call = call;
   }
 
-  get _projectId(): BigInt {
+  get _gameId(): BigInt {
     return this._call.inputValues[0].value.toBigInt();
   }
 
-  get _directory(): Address {
-    return this._call.inputValues[1].value.toAddress();
-  }
-
   get _name(): string {
-    return this._call.inputValues[2].value.toString();
+    return this._call.inputValues[1].value.toString();
   }
 
   get _symbol(): string {
-    return this._call.inputValues[3].value.toString();
+    return this._call.inputValues[2].value.toString();
   }
 
-  get _fundingCycleStore(): Address {
-    return this._call.inputValues[4].value.toAddress();
+  get _rulesets(): Address {
+    return this._call.inputValues[3].value.toAddress();
   }
 
   get _baseUri(): string {
-    return this._call.inputValues[5].value.toString();
+    return this._call.inputValues[4].value.toString();
   }
 
   get _tokenUriResolver(): Address {
-    return this._call.inputValues[6].value.toAddress();
+    return this._call.inputValues[5].value.toAddress();
   }
 
   get _contractUri(): string {
-    return this._call.inputValues[7].value.toString();
+    return this._call.inputValues[6].value.toString();
   }
 
-  get _pricing(): InitializeCall_pricingStruct {
-    return changetype<InitializeCall_pricingStruct>(
-      this._call.inputValues[8].value.toTuple()
-    );
+  get _tiers(): Array<InitializeCall_tiersStruct> {
+    return this._call.inputValues[7].value.toTupleArray<InitializeCall_tiersStruct>();
+  }
+
+  get _currency(): BigInt {
+    return this._call.inputValues[8].value.toBigInt();
   }
 
   get _store(): Address {
     return this._call.inputValues[9].value.toAddress();
   }
 
-  get _flags(): InitializeCall_flagsStruct {
-    return changetype<InitializeCall_flagsStruct>(
-      this._call.inputValues[10].value.toTuple()
-    );
+  get _gamePhaseReporter(): Address {
+    return this._call.inputValues[10].value.toAddress();
+  }
+
+  get _gamePotReporter(): Address {
+    return this._call.inputValues[11].value.toAddress();
+  }
+
+  get _defaultAttestationDelegate(): Address {
+    return this._call.inputValues[12].value.toAddress();
+  }
+
+  get _tierNames(): Array<string> {
+    return this._call.inputValues[13].value.toStringArray();
   }
 }
 
@@ -1819,157 +2147,61 @@ export class InitializeCall__Outputs {
   }
 }
 
-export class InitializeCall_pricingStruct extends ethereum.Tuple {
-  get tiers(): Array<InitializeCall_pricingTiersStruct> {
-    return this[0].toTupleArray<InitializeCall_pricingTiersStruct>();
-  }
-
-  get currency(): BigInt {
-    return this[1].toBigInt();
-  }
-
-  get decimals(): BigInt {
-    return this[2].toBigInt();
-  }
-
-  get prices(): Address {
-    return this[3].toAddress();
-  }
-}
-
-export class InitializeCall_pricingTiersStruct extends ethereum.Tuple {
-  get contributionFloor(): BigInt {
+export class InitializeCall_tiersStruct extends ethereum.Tuple {
+  get price(): BigInt {
     return this[0].toBigInt();
   }
 
-  get lockedUntil(): BigInt {
+  get initialSupply(): BigInt {
     return this[1].toBigInt();
   }
 
-  get initialQuantity(): BigInt {
+  get votingUnits(): BigInt {
     return this[2].toBigInt();
   }
 
-  get votingUnits(): i32 {
+  get reserveFrequency(): i32 {
     return this[3].toI32();
   }
 
-  get reservedRate(): i32 {
-    return this[4].toI32();
-  }
-
-  get reservedTokenBeneficiary(): Address {
-    return this[5].toAddress();
+  get reserveBeneficiary(): Address {
+    return this[4].toAddress();
   }
 
   get encodedIPFSUri(): Bytes {
-    return this[6].toBytes();
+    return this[5].toBytes();
   }
 
-  get allowManualMint(): boolean {
-    return this[7].toBoolean();
+  get category(): i32 {
+    return this[6].toI32();
   }
 
-  get shouldUseBeneficiaryAsDefault(): boolean {
+  get discountPercent(): i32 {
+    return this[7].toI32();
+  }
+
+  get allowOwnerMint(): boolean {
     return this[8].toBoolean();
   }
 
-  get transfersPausable(): boolean {
+  get useReserveBeneficiaryAsDefault(): boolean {
     return this[9].toBoolean();
   }
-}
 
-export class InitializeCall_flagsStruct extends ethereum.Tuple {
-  get lockReservedTokenChanges(): boolean {
-    return this[0].toBoolean();
+  get transfersPausable(): boolean {
+    return this[10].toBoolean();
   }
 
-  get lockVotingUnitChanges(): boolean {
-    return this[1].toBoolean();
+  get useVotingUnits(): boolean {
+    return this[11].toBoolean();
   }
 
-  get lockManualMintingChanges(): boolean {
-    return this[2].toBoolean();
-  }
-}
-
-export class MintForCall extends ethereum.Call {
-  get inputs(): MintForCall__Inputs {
-    return new MintForCall__Inputs(this);
+  get cannotBeRemoved(): boolean {
+    return this[12].toBoolean();
   }
 
-  get outputs(): MintForCall__Outputs {
-    return new MintForCall__Outputs(this);
-  }
-}
-
-export class MintForCall__Inputs {
-  _call: MintForCall;
-
-  constructor(call: MintForCall) {
-    this._call = call;
-  }
-
-  get _mintForTiersData(): Array<MintForCall_mintForTiersDataStruct> {
-    return this._call.inputValues[0].value.toTupleArray<
-      MintForCall_mintForTiersDataStruct
-    >();
-  }
-}
-
-export class MintForCall__Outputs {
-  _call: MintForCall;
-
-  constructor(call: MintForCall) {
-    this._call = call;
-  }
-}
-
-export class MintForCall_mintForTiersDataStruct extends ethereum.Tuple {
-  get tierIds(): Array<i32> {
-    return this[0].toI32Array();
-  }
-
-  get beneficiary(): Address {
-    return this[1].toAddress();
-  }
-}
-
-export class MintFor1Call extends ethereum.Call {
-  get inputs(): MintFor1Call__Inputs {
-    return new MintFor1Call__Inputs(this);
-  }
-
-  get outputs(): MintFor1Call__Outputs {
-    return new MintFor1Call__Outputs(this);
-  }
-}
-
-export class MintFor1Call__Inputs {
-  _call: MintFor1Call;
-
-  constructor(call: MintFor1Call) {
-    this._call = call;
-  }
-
-  get _tierIds(): Array<i32> {
-    return this._call.inputValues[0].value.toI32Array();
-  }
-
-  get _beneficiary(): Address {
-    return this._call.inputValues[1].value.toAddress();
-  }
-}
-
-export class MintFor1Call__Outputs {
-  _call: MintFor1Call;
-
-  constructor(call: MintFor1Call) {
-    this._call = call;
-  }
-
-  get tokenIds(): Array<BigInt> {
-    return this._call.outputValues[0].value.toBigIntArray();
+  get cannotIncreaseDiscountPercent(): boolean {
+    return this[13].toBoolean();
   }
 }
 
@@ -1990,12 +2222,8 @@ export class MintReservesForCall__Inputs {
     this._call = call;
   }
 
-  get _mintReservesForTiersData(): Array<
-    MintReservesForCall_mintReservesForTiersDataStruct
-  > {
-    return this._call.inputValues[0].value.toTupleArray<
-      MintReservesForCall_mintReservesForTiersDataStruct
-    >();
+  get _mintReservesForTiersData(): Array<MintReservesForCall_mintReservesForTiersDataStruct> {
+    return this._call.inputValues[0].value.toTupleArray<MintReservesForCall_mintReservesForTiersDataStruct>();
   }
 }
 
@@ -2012,8 +2240,8 @@ export class MintReservesForCall_mintReservesForTiersDataStruct extends ethereum
     return this[0].toBigInt();
   }
 
-  get count(): BigInt {
-    return this[1].toBigInt();
+  get count(): i32 {
+    return this[1].toI32();
   }
 }
 
@@ -2191,110 +2419,60 @@ export class SetApprovalForAllCall__Outputs {
   }
 }
 
-export class SetBaseUriCall extends ethereum.Call {
-  get inputs(): SetBaseUriCall__Inputs {
-    return new SetBaseUriCall__Inputs(this);
+export class SetTierCashOutWeightsToCall extends ethereum.Call {
+  get inputs(): SetTierCashOutWeightsToCall__Inputs {
+    return new SetTierCashOutWeightsToCall__Inputs(this);
   }
 
-  get outputs(): SetBaseUriCall__Outputs {
-    return new SetBaseUriCall__Outputs(this);
+  get outputs(): SetTierCashOutWeightsToCall__Outputs {
+    return new SetTierCashOutWeightsToCall__Outputs(this);
   }
 }
 
-export class SetBaseUriCall__Inputs {
-  _call: SetBaseUriCall;
+export class SetTierCashOutWeightsToCall__Inputs {
+  _call: SetTierCashOutWeightsToCall;
 
-  constructor(call: SetBaseUriCall) {
+  constructor(call: SetTierCashOutWeightsToCall) {
     this._call = call;
   }
 
-  get _baseUri(): string {
-    return this._call.inputValues[0].value.toString();
+  get _tierWeights(): Array<SetTierCashOutWeightsToCall_tierWeightsStruct> {
+    return this._call.inputValues[0].value.toTupleArray<SetTierCashOutWeightsToCall_tierWeightsStruct>();
   }
 }
 
-export class SetBaseUriCall__Outputs {
-  _call: SetBaseUriCall;
+export class SetTierCashOutWeightsToCall__Outputs {
+  _call: SetTierCashOutWeightsToCall;
 
-  constructor(call: SetBaseUriCall) {
-    this._call = call;
-  }
-}
-
-export class SetContractUriCall extends ethereum.Call {
-  get inputs(): SetContractUriCall__Inputs {
-    return new SetContractUriCall__Inputs(this);
-  }
-
-  get outputs(): SetContractUriCall__Outputs {
-    return new SetContractUriCall__Outputs(this);
-  }
-}
-
-export class SetContractUriCall__Inputs {
-  _call: SetContractUriCall;
-
-  constructor(call: SetContractUriCall) {
-    this._call = call;
-  }
-
-  get _contractUri(): string {
-    return this._call.inputValues[0].value.toString();
-  }
-}
-
-export class SetContractUriCall__Outputs {
-  _call: SetContractUriCall;
-
-  constructor(call: SetContractUriCall) {
+  constructor(call: SetTierCashOutWeightsToCall) {
     this._call = call;
   }
 }
 
-export class SetDefaultReservedTokenBeneficiaryCall extends ethereum.Call {
-  get inputs(): SetDefaultReservedTokenBeneficiaryCall__Inputs {
-    return new SetDefaultReservedTokenBeneficiaryCall__Inputs(this);
+export class SetTierCashOutWeightsToCall_tierWeightsStruct extends ethereum.Tuple {
+  get id(): BigInt {
+    return this[0].toBigInt();
   }
 
-  get outputs(): SetDefaultReservedTokenBeneficiaryCall__Outputs {
-    return new SetDefaultReservedTokenBeneficiaryCall__Outputs(this);
-  }
-}
-
-export class SetDefaultReservedTokenBeneficiaryCall__Inputs {
-  _call: SetDefaultReservedTokenBeneficiaryCall;
-
-  constructor(call: SetDefaultReservedTokenBeneficiaryCall) {
-    this._call = call;
-  }
-
-  get _beneficiary(): Address {
-    return this._call.inputValues[0].value.toAddress();
+  get cashOutWeight(): BigInt {
+    return this[1].toBigInt();
   }
 }
 
-export class SetDefaultReservedTokenBeneficiaryCall__Outputs {
-  _call: SetDefaultReservedTokenBeneficiaryCall;
+export class SetTierDelegateToCall extends ethereum.Call {
+  get inputs(): SetTierDelegateToCall__Inputs {
+    return new SetTierDelegateToCall__Inputs(this);
+  }
 
-  constructor(call: SetDefaultReservedTokenBeneficiaryCall) {
-    this._call = call;
+  get outputs(): SetTierDelegateToCall__Outputs {
+    return new SetTierDelegateToCall__Outputs(this);
   }
 }
 
-export class SetTierDelegateCall extends ethereum.Call {
-  get inputs(): SetTierDelegateCall__Inputs {
-    return new SetTierDelegateCall__Inputs(this);
-  }
+export class SetTierDelegateToCall__Inputs {
+  _call: SetTierDelegateToCall;
 
-  get outputs(): SetTierDelegateCall__Outputs {
-    return new SetTierDelegateCall__Outputs(this);
-  }
-}
-
-export class SetTierDelegateCall__Inputs {
-  _call: SetTierDelegateCall;
-
-  constructor(call: SetTierDelegateCall) {
+  constructor(call: SetTierDelegateToCall) {
     this._call = call;
   }
 
@@ -2307,127 +2485,51 @@ export class SetTierDelegateCall__Inputs {
   }
 }
 
-export class SetTierDelegateCall__Outputs {
-  _call: SetTierDelegateCall;
+export class SetTierDelegateToCall__Outputs {
+  _call: SetTierDelegateToCall;
 
-  constructor(call: SetTierDelegateCall) {
+  constructor(call: SetTierDelegateToCall) {
     this._call = call;
   }
 }
 
-export class SetTierDelegatesCall extends ethereum.Call {
-  get inputs(): SetTierDelegatesCall__Inputs {
-    return new SetTierDelegatesCall__Inputs(this);
+export class SetTierDelegatesToCall extends ethereum.Call {
+  get inputs(): SetTierDelegatesToCall__Inputs {
+    return new SetTierDelegatesToCall__Inputs(this);
   }
 
-  get outputs(): SetTierDelegatesCall__Outputs {
-    return new SetTierDelegatesCall__Outputs(this);
+  get outputs(): SetTierDelegatesToCall__Outputs {
+    return new SetTierDelegatesToCall__Outputs(this);
   }
 }
 
-export class SetTierDelegatesCall__Inputs {
-  _call: SetTierDelegatesCall;
+export class SetTierDelegatesToCall__Inputs {
+  _call: SetTierDelegatesToCall;
 
-  constructor(call: SetTierDelegatesCall) {
+  constructor(call: SetTierDelegatesToCall) {
     this._call = call;
   }
 
-  get _setTierDelegatesData(): Array<
-    SetTierDelegatesCall_setTierDelegatesDataStruct
-  > {
-    return this._call.inputValues[0].value.toTupleArray<
-      SetTierDelegatesCall_setTierDelegatesDataStruct
-    >();
+  get _setTierDelegatesData(): Array<SetTierDelegatesToCall_setTierDelegatesDataStruct> {
+    return this._call.inputValues[0].value.toTupleArray<SetTierDelegatesToCall_setTierDelegatesDataStruct>();
   }
 }
 
-export class SetTierDelegatesCall__Outputs {
-  _call: SetTierDelegatesCall;
+export class SetTierDelegatesToCall__Outputs {
+  _call: SetTierDelegatesToCall;
 
-  constructor(call: SetTierDelegatesCall) {
+  constructor(call: SetTierDelegatesToCall) {
     this._call = call;
   }
 }
 
-export class SetTierDelegatesCall_setTierDelegatesDataStruct extends ethereum.Tuple {
+export class SetTierDelegatesToCall_setTierDelegatesDataStruct extends ethereum.Tuple {
   get delegatee(): Address {
     return this[0].toAddress();
   }
 
   get tierId(): BigInt {
     return this[1].toBigInt();
-  }
-}
-
-export class SetTierRedemptionWeightsCall extends ethereum.Call {
-  get inputs(): SetTierRedemptionWeightsCall__Inputs {
-    return new SetTierRedemptionWeightsCall__Inputs(this);
-  }
-
-  get outputs(): SetTierRedemptionWeightsCall__Outputs {
-    return new SetTierRedemptionWeightsCall__Outputs(this);
-  }
-}
-
-export class SetTierRedemptionWeightsCall__Inputs {
-  _call: SetTierRedemptionWeightsCall;
-
-  constructor(call: SetTierRedemptionWeightsCall) {
-    this._call = call;
-  }
-
-  get _tierWeights(): Array<SetTierRedemptionWeightsCall_tierWeightsStruct> {
-    return this._call.inputValues[0].value.toTupleArray<
-      SetTierRedemptionWeightsCall_tierWeightsStruct
-    >();
-  }
-}
-
-export class SetTierRedemptionWeightsCall__Outputs {
-  _call: SetTierRedemptionWeightsCall;
-
-  constructor(call: SetTierRedemptionWeightsCall) {
-    this._call = call;
-  }
-}
-
-export class SetTierRedemptionWeightsCall_tierWeightsStruct extends ethereum.Tuple {
-  get id(): BigInt {
-    return this[0].toBigInt();
-  }
-
-  get redemptionWeight(): BigInt {
-    return this[1].toBigInt();
-  }
-}
-
-export class SetTokenUriResolverCall extends ethereum.Call {
-  get inputs(): SetTokenUriResolverCall__Inputs {
-    return new SetTokenUriResolverCall__Inputs(this);
-  }
-
-  get outputs(): SetTokenUriResolverCall__Outputs {
-    return new SetTokenUriResolverCall__Outputs(this);
-  }
-}
-
-export class SetTokenUriResolverCall__Inputs {
-  _call: SetTokenUriResolverCall;
-
-  constructor(call: SetTokenUriResolverCall) {
-    this._call = call;
-  }
-
-  get _tokenUriResolver(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-}
-
-export class SetTokenUriResolverCall__Outputs {
-  _call: SetTokenUriResolverCall;
-
-  constructor(call: SetTokenUriResolverCall) {
-    this._call = call;
   }
 }
 

@@ -3,7 +3,7 @@
 import {
   Address,
   DataSourceTemplate,
-  DataSourceContext
+  DataSourceContext,
 } from "@graphprotocol/graph-ts";
 
 export class DefifaNFT extends DataSourceTemplate {
@@ -15,7 +15,7 @@ export class DefifaNFT extends DataSourceTemplate {
     DataSourceTemplate.createWithContext(
       "DefifaNFT",
       [address.toHex()],
-      context
+      context,
     );
   }
 }
@@ -29,7 +29,7 @@ export class Governor extends DataSourceTemplate {
     DataSourceTemplate.createWithContext(
       "Governor",
       [address.toHex()],
-      context
+      context,
     );
   }
 }

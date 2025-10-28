@@ -7,8 +7,88 @@ import {
   Entity,
   Bytes,
   Address,
-  BigInt
+  BigInt,
 } from "@graphprotocol/graph-ts";
+
+export class DistributeToSplit extends ethereum.Event {
+  get params(): DistributeToSplit__Params {
+    return new DistributeToSplit__Params(this);
+  }
+}
+
+export class DistributeToSplit__Params {
+  _event: DistributeToSplit;
+
+  constructor(event: DistributeToSplit) {
+    this._event = event;
+  }
+
+  get split(): DistributeToSplitSplitStruct {
+    return changetype<DistributeToSplitSplitStruct>(
+      this._event.parameters[0].value.toTuple(),
+    );
+  }
+
+  get amount(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+
+  get caller(): Address {
+    return this._event.parameters[2].value.toAddress();
+  }
+}
+
+export class DistributeToSplitSplitStruct extends ethereum.Tuple {
+  get percent(): BigInt {
+    return this[0].toBigInt();
+  }
+
+  get projectId(): BigInt {
+    return this[1].toBigInt();
+  }
+
+  get beneficiary(): Address {
+    return this[2].toAddress();
+  }
+
+  get preferAddToBalance(): boolean {
+    return this[3].toBoolean();
+  }
+
+  get lockedUntil(): BigInt {
+    return this[4].toBigInt();
+  }
+
+  get hook(): Address {
+    return this[5].toAddress();
+  }
+}
+
+export class FulfilledCommitments extends ethereum.Event {
+  get params(): FulfilledCommitments__Params {
+    return new FulfilledCommitments__Params(this);
+  }
+}
+
+export class FulfilledCommitments__Params {
+  _event: FulfilledCommitments;
+
+  constructor(event: FulfilledCommitments) {
+    this._event = event;
+  }
+
+  get gameId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get pot(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+
+  get caller(): Address {
+    return this._event.parameters[2].value.toAddress();
+  }
+}
 
 export class LaunchGame extends ethereum.Event {
   get params(): LaunchGame__Params {
@@ -44,50 +124,101 @@ export class LaunchGame__Params {
   }
 }
 
-export class OwnershipTransferred extends ethereum.Event {
-  get params(): OwnershipTransferred__Params {
-    return new OwnershipTransferred__Params(this);
+export class QueuedNoContest extends ethereum.Event {
+  get params(): QueuedNoContest__Params {
+    return new QueuedNoContest__Params(this);
   }
 }
 
-export class OwnershipTransferred__Params {
-  _event: OwnershipTransferred;
+export class QueuedNoContest__Params {
+  _event: QueuedNoContest;
 
-  constructor(event: OwnershipTransferred) {
+  constructor(event: QueuedNoContest) {
     this._event = event;
   }
 
-  get previousOwner(): Address {
-    return this._event.parameters[0].value.toAddress();
+  get gameId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
   }
 
-  get newOwner(): Address {
+  get caller(): Address {
     return this._event.parameters[1].value.toAddress();
   }
 }
 
-export class DefifaDeployer__launchGameWithResult {
+export class QueuedRefundPhase extends ethereum.Event {
+  get params(): QueuedRefundPhase__Params {
+    return new QueuedRefundPhase__Params(this);
+  }
+}
+
+export class QueuedRefundPhase__Params {
+  _event: QueuedRefundPhase;
+
+  constructor(event: QueuedRefundPhase) {
+    this._event = event;
+  }
+
+  get gameId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get caller(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+}
+
+export class QueuedScoringPhase extends ethereum.Event {
+  get params(): QueuedScoringPhase__Params {
+    return new QueuedScoringPhase__Params(this);
+  }
+}
+
+export class QueuedScoringPhase__Params {
+  _event: QueuedScoringPhase;
+
+  constructor(event: QueuedScoringPhase) {
+    this._event = event;
+  }
+
+  get gameId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get caller(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+}
+
+export class DefifaDeployer__currentGamePotOfResult {
   value0: BigInt;
   value1: Address;
+  value2: BigInt;
 
-  constructor(value0: BigInt, value1: Address) {
+  constructor(value0: BigInt, value1: Address, value2: BigInt) {
     this.value0 = value0;
     this.value1 = value1;
+    this.value2 = value2;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
     let map = new TypedMap<string, ethereum.Value>();
     map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
     map.set("value1", ethereum.Value.fromAddress(this.value1));
+    map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
     return map;
   }
 
-  getGameId(): BigInt {
+  getValue0(): BigInt {
     return this.value0;
   }
 
-  getGovernor(): Address {
+  getValue1(): Address {
     return this.value1;
+  }
+
+  getValue2(): BigInt {
+    return this.value2;
   }
 }
 
@@ -96,10 +227,8 @@ export class DefifaDeployer__launchGameWithInput_launchProjectDataStruct extends
     return this[0].toString();
   }
 
-  get projectMetadata(): DefifaDeployer__launchGameWithInput_launchProjectDataProjectMetadataStruct {
-    return changetype<
-      DefifaDeployer__launchGameWithInput_launchProjectDataProjectMetadataStruct
-    >(this[1].toTuple());
+  get projectUri(): string {
+    return this[1].toString();
   }
 
   get contractUri(): string {
@@ -110,148 +239,158 @@ export class DefifaDeployer__launchGameWithInput_launchProjectDataStruct extends
     return this[3].toString();
   }
 
-  get tiers(): Array<
-    DefifaDeployer__launchGameWithInput_launchProjectDataTiersStruct
-  > {
-    return this[4].toTupleArray<
-      DefifaDeployer__launchGameWithInput_launchProjectDataTiersStruct
-    >();
+  get tiers(): Array<DefifaDeployer__launchGameWithInput_launchProjectDataTiersStruct> {
+    return this[4].toTupleArray<DefifaDeployer__launchGameWithInput_launchProjectDataTiersStruct>();
   }
 
-  get token(): Address {
-    return this[5].toAddress();
+  get token(): DefifaDeployer__launchGameWithInput_launchProjectDataTokenStruct {
+    return changetype<DefifaDeployer__launchGameWithInput_launchProjectDataTokenStruct>(
+      this[5].toTuple(),
+    );
   }
 
-  get mintDuration(): BigInt {
-    return this[6].toBigInt();
+  get mintPeriodDuration(): i32 {
+    return this[6].toI32();
   }
 
-  get refundPeriodDuration(): BigInt {
-    return this[7].toBigInt();
+  get refundPeriodDuration(): i32 {
+    return this[7].toI32();
   }
 
   get start(): BigInt {
     return this[8].toBigInt();
   }
 
-  get end(): BigInt {
-    return this[9].toBigInt();
+  get splits(): Array<DefifaDeployer__launchGameWithInput_launchProjectDataSplitsStruct> {
+    return this[9].toTupleArray<DefifaDeployer__launchGameWithInput_launchProjectDataSplitsStruct>();
   }
 
-  get splits(): Array<
-    DefifaDeployer__launchGameWithInput_launchProjectDataSplitsStruct
-  > {
-    return this[10].toTupleArray<
-      DefifaDeployer__launchGameWithInput_launchProjectDataSplitsStruct
-    >();
+  get attestationStartTime(): BigInt {
+    return this[10].toBigInt();
   }
 
-  get distributionLimit(): BigInt {
+  get attestationGracePeriod(): BigInt {
     return this[11].toBigInt();
   }
 
-  get ballkidzFeeProjectTokenAccount(): Address {
+  get defaultAttestationDelegate(): Address {
     return this[12].toAddress();
   }
 
-  get votingPeriod(): BigInt {
-    return this[13].toBigInt();
-  }
-
   get defaultTokenUriResolver(): Address {
-    return this[14].toAddress();
+    return this[13].toAddress();
   }
 
   get terminal(): Address {
-    return this[15].toAddress();
+    return this[14].toAddress();
   }
 
   get store(): Address {
-    return this[16].toAddress();
-  }
-}
-
-export class DefifaDeployer__launchGameWithInput_launchProjectDataProjectMetadataStruct extends ethereum.Tuple {
-  get content(): string {
-    return this[0].toString();
-  }
-
-  get domain(): BigInt {
-    return this[1].toBigInt();
+    return this[15].toAddress();
   }
 }
 
 export class DefifaDeployer__launchGameWithInput_launchProjectDataTiersStruct extends ethereum.Tuple {
+  get name(): string {
+    return this[0].toString();
+  }
+
   get price(): BigInt {
-    return this[0].toBigInt();
+    return this[1].toBigInt();
   }
 
   get reservedRate(): i32 {
-    return this[1].toI32();
+    return this[2].toI32();
   }
 
   get reservedTokenBeneficiary(): Address {
-    return this[2].toAddress();
+    return this[3].toAddress();
   }
 
   get encodedIPFSUri(): Bytes {
-    return this[3].toBytes();
+    return this[4].toBytes();
   }
 
   get shouldUseReservedTokenBeneficiaryAsDefault(): boolean {
-    return this[4].toBoolean();
+    return this[5].toBoolean();
+  }
+}
+
+export class DefifaDeployer__launchGameWithInput_launchProjectDataTokenStruct extends ethereum.Tuple {
+  get token(): Address {
+    return this[0].toAddress();
   }
 
-  get name(): string {
-    return this[5].toString();
+  get decimals(): i32 {
+    return this[1].toI32();
+  }
+
+  get currency(): BigInt {
+    return this[2].toBigInt();
   }
 }
 
 export class DefifaDeployer__launchGameWithInput_launchProjectDataSplitsStruct extends ethereum.Tuple {
-  get preferClaimed(): boolean {
-    return this[0].toBoolean();
-  }
-
-  get preferAddToBalance(): boolean {
-    return this[1].toBoolean();
-  }
-
   get percent(): BigInt {
-    return this[2].toBigInt();
-  }
-
-  get projectId(): BigInt {
-    return this[3].toBigInt();
-  }
-
-  get beneficiary(): Address {
-    return this[4].toAddress();
-  }
-
-  get lockedUntil(): BigInt {
-    return this[5].toBigInt();
-  }
-
-  get allocator(): Address {
-    return this[6].toAddress();
-  }
-}
-
-export class DefifaDeployer__timesForResultValue0Struct extends ethereum.Tuple {
-  get mintDuration(): BigInt {
     return this[0].toBigInt();
   }
 
-  get refundPeriodDuration(): BigInt {
+  get projectId(): BigInt {
     return this[1].toBigInt();
   }
 
-  get start(): BigInt {
-    return this[2].toBigInt();
+  get beneficiary(): Address {
+    return this[2].toAddress();
   }
 
-  get end(): BigInt {
-    return this[3].toBigInt();
+  get preferAddToBalance(): boolean {
+    return this[3].toBoolean();
+  }
+
+  get lockedUntil(): BigInt {
+    return this[4].toBigInt();
+  }
+
+  get hook(): Address {
+    return this[5].toAddress();
+  }
+}
+
+export class DefifaDeployer__timesForResult {
+  value0: BigInt;
+  value1: i32;
+  value2: i32;
+
+  constructor(value0: BigInt, value1: i32, value2: i32) {
+    this.value0 = value0;
+    this.value1 = value1;
+    this.value2 = value2;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
+    map.set(
+      "value1",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(this.value1)),
+    );
+    map.set(
+      "value2",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(this.value2)),
+    );
+    return map;
+  }
+
+  getValue0(): BigInt {
+    return this.value0;
+  }
+
+  getValue1(): i32 {
+    return this.value1;
+  }
+
+  getValue2(): i32 {
+    return this.value2;
   }
 }
 
@@ -260,14 +399,22 @@ export class DefifaDeployer extends ethereum.SmartContract {
     return new DefifaDeployer("DefifaDeployer", address);
   }
 
-  SPLIT_DOMAIN(): BigInt {
-    let result = super.call("SPLIT_DOMAIN", "SPLIT_DOMAIN():(uint256)", []);
+  baseProtocolFeeDivisor(): BigInt {
+    let result = super.call(
+      "baseProtocolFeeDivisor",
+      "baseProtocolFeeDivisor():(uint256)",
+      [],
+    );
 
     return result[0].toBigInt();
   }
 
-  try_SPLIT_DOMAIN(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("SPLIT_DOMAIN", "SPLIT_DOMAIN():(uint256)", []);
+  try_baseProtocolFeeDivisor(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "baseProtocolFeeDivisor",
+      "baseProtocolFeeDivisor():(uint256)",
+      [],
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -275,21 +422,21 @@ export class DefifaDeployer extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  ballkidzProjectId(): BigInt {
+  baseProtocolProjectId(): BigInt {
     let result = super.call(
-      "ballkidzProjectId",
-      "ballkidzProjectId():(uint256)",
-      []
+      "baseProtocolProjectId",
+      "baseProtocolProjectId():(uint256)",
+      [],
     );
 
     return result[0].toBigInt();
   }
 
-  try_ballkidzProjectId(): ethereum.CallResult<BigInt> {
+  try_baseProtocolProjectId(): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "ballkidzProjectId",
-      "ballkidzProjectId():(uint256)",
-      []
+      "baseProtocolProjectId",
+      "baseProtocolProjectId():(uint256)",
+      [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -313,21 +460,112 @@ export class DefifaDeployer extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  currentGamePhaseOf(_gameId: BigInt): BigInt {
+  currentGamePhaseOf(_gameId: BigInt): i32 {
     let result = super.call(
       "currentGamePhaseOf",
-      "currentGamePhaseOf(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_gameId)]
+      "currentGamePhaseOf(uint256):(uint8)",
+      [ethereum.Value.fromUnsignedBigInt(_gameId)],
+    );
+
+    return result[0].toI32();
+  }
+
+  try_currentGamePhaseOf(_gameId: BigInt): ethereum.CallResult<i32> {
+    let result = super.tryCall(
+      "currentGamePhaseOf",
+      "currentGamePhaseOf(uint256):(uint8)",
+      [ethereum.Value.fromUnsignedBigInt(_gameId)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toI32());
+  }
+
+  currentGamePotOf(
+    _gameId: BigInt,
+    _includeCommitments: boolean,
+  ): DefifaDeployer__currentGamePotOfResult {
+    let result = super.call(
+      "currentGamePotOf",
+      "currentGamePotOf(uint256,bool):(uint256,address,uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_gameId),
+        ethereum.Value.fromBoolean(_includeCommitments),
+      ],
+    );
+
+    return new DefifaDeployer__currentGamePotOfResult(
+      result[0].toBigInt(),
+      result[1].toAddress(),
+      result[2].toBigInt(),
+    );
+  }
+
+  try_currentGamePotOf(
+    _gameId: BigInt,
+    _includeCommitments: boolean,
+  ): ethereum.CallResult<DefifaDeployer__currentGamePotOfResult> {
+    let result = super.tryCall(
+      "currentGamePotOf",
+      "currentGamePotOf(uint256,bool):(uint256,address,uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_gameId),
+        ethereum.Value.fromBoolean(_includeCommitments),
+      ],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new DefifaDeployer__currentGamePotOfResult(
+        value[0].toBigInt(),
+        value[1].toAddress(),
+        value[2].toBigInt(),
+      ),
+    );
+  }
+
+  defifaFeeDivisor(): BigInt {
+    let result = super.call(
+      "defifaFeeDivisor",
+      "defifaFeeDivisor():(uint256)",
+      [],
     );
 
     return result[0].toBigInt();
   }
 
-  try_currentGamePhaseOf(_gameId: BigInt): ethereum.CallResult<BigInt> {
+  try_defifaFeeDivisor(): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "currentGamePhaseOf",
-      "currentGamePhaseOf(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_gameId)]
+      "defifaFeeDivisor",
+      "defifaFeeDivisor():(uint256)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  defifaProjectId(): BigInt {
+    let result = super.call(
+      "defifaProjectId",
+      "defifaProjectId():(uint256)",
+      [],
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_defifaProjectId(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "defifaProjectId",
+      "defifaProjectId():(uint256)",
+      [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -340,7 +578,7 @@ export class DefifaDeployer extends ethereum.SmartContract {
     let result = super.call(
       "delegateCodeOrigin",
       "delegateCodeOrigin():(address)",
-      []
+      [],
     );
 
     return result[0].toAddress();
@@ -350,7 +588,7 @@ export class DefifaDeployer extends ethereum.SmartContract {
     let result = super.tryCall(
       "delegateCodeOrigin",
       "delegateCodeOrigin():(address)",
-      []
+      [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -359,102 +597,37 @@ export class DefifaDeployer extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  delegatesRegistry(): Address {
+  fulfilledCommitmentsOf(param0: BigInt): BigInt {
     let result = super.call(
-      "delegatesRegistry",
-      "delegatesRegistry():(address)",
-      []
+      "fulfilledCommitmentsOf",
+      "fulfilledCommitmentsOf(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(param0)],
     );
+
+    return result[0].toBigInt();
+  }
+
+  try_fulfilledCommitmentsOf(param0: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "fulfilledCommitmentsOf",
+      "fulfilledCommitmentsOf(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(param0)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  governor(): Address {
+    let result = super.call("governor", "governor():(address)", []);
 
     return result[0].toAddress();
   }
 
-  try_delegatesRegistry(): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "delegatesRegistry",
-      "delegatesRegistry():(address)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  distributionLimit(_gameId: BigInt): BigInt {
-    let result = super.call(
-      "distributionLimit",
-      "distributionLimit(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_gameId)]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_distributionLimit(_gameId: BigInt): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "distributionLimit",
-      "distributionLimit(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_gameId)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  endOf(_gameId: BigInt): BigInt {
-    let result = super.call("endOf", "endOf(uint256):(uint256)", [
-      ethereum.Value.fromUnsignedBigInt(_gameId)
-    ]);
-
-    return result[0].toBigInt();
-  }
-
-  try_endOf(_gameId: BigInt): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("endOf", "endOf(uint256):(uint256)", [
-      ethereum.Value.fromUnsignedBigInt(_gameId)
-    ]);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  feeDivisor(): BigInt {
-    let result = super.call("feeDivisor", "feeDivisor():(uint256)", []);
-
-    return result[0].toBigInt();
-  }
-
-  try_feeDivisor(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("feeDivisor", "feeDivisor():(uint256)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  governorCodeOrigin(): Address {
-    let result = super.call(
-      "governorCodeOrigin",
-      "governorCodeOrigin():(address)",
-      []
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_governorCodeOrigin(): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "governorCodeOrigin",
-      "governorCodeOrigin():(address)",
-      []
-    );
+  try_governor(): ethereum.CallResult<Address> {
+    let result = super.tryCall("governor", "governor():(address)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -463,55 +636,24 @@ export class DefifaDeployer extends ethereum.SmartContract {
   }
 
   launchGameWith(
-    _launchProjectData: DefifaDeployer__launchGameWithInput_launchProjectDataStruct
-  ): DefifaDeployer__launchGameWithResult {
+    _launchProjectData: DefifaDeployer__launchGameWithInput_launchProjectDataStruct,
+  ): BigInt {
     let result = super.call(
       "launchGameWith",
-      "launchGameWith((string,(string,uint256),string,string,(uint80,uint16,address,bytes32,bool,string)[],address,uint48,uint48,uint48,uint48,(bool,bool,uint256,uint256,address,uint256,address)[],uint88,address,uint256,address,address,address)):(uint256,address)",
-      [ethereum.Value.fromTuple(_launchProjectData)]
-    );
-
-    return new DefifaDeployer__launchGameWithResult(
-      result[0].toBigInt(),
-      result[1].toAddress()
-    );
-  }
-
-  try_launchGameWith(
-    _launchProjectData: DefifaDeployer__launchGameWithInput_launchProjectDataStruct
-  ): ethereum.CallResult<DefifaDeployer__launchGameWithResult> {
-    let result = super.tryCall(
-      "launchGameWith",
-      "launchGameWith((string,(string,uint256),string,string,(uint80,uint16,address,bytes32,bool,string)[],address,uint48,uint48,uint48,uint48,(bool,bool,uint256,uint256,address,uint256,address)[],uint88,address,uint256,address,address,address)):(uint256,address)",
-      [ethereum.Value.fromTuple(_launchProjectData)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(
-      new DefifaDeployer__launchGameWithResult(
-        value[0].toBigInt(),
-        value[1].toAddress()
-      )
-    );
-  }
-
-  mintDurationOf(_gameId: BigInt): BigInt {
-    let result = super.call(
-      "mintDurationOf",
-      "mintDurationOf(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_gameId)]
+      "launchGameWith((string,string,string,string,(string,uint80,uint16,address,bytes32,bool)[],(address,uint8,uint32),uint24,uint24,uint48,(uint32,uint64,address,bool,uint48,address)[],uint256,uint256,address,address,address,address)):(uint256)",
+      [ethereum.Value.fromTuple(_launchProjectData)],
     );
 
     return result[0].toBigInt();
   }
 
-  try_mintDurationOf(_gameId: BigInt): ethereum.CallResult<BigInt> {
+  try_launchGameWith(
+    _launchProjectData: DefifaDeployer__launchGameWithInput_launchProjectDataStruct,
+  ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "mintDurationOf",
-      "mintDurationOf(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_gameId)]
+      "launchGameWith",
+      "launchGameWith((string,string,string,string,(string,uint80,uint16,address,bytes32,bool)[],(address,uint8,uint32),uint24,uint24,uint48,(uint32,uint64,address,bool,uint48,address)[],uint256,uint256,address,address,address,address)):(uint256)",
+      [ethereum.Value.fromTuple(_launchProjectData)],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -524,7 +666,7 @@ export class DefifaDeployer extends ethereum.SmartContract {
     let result = super.call(
       "nextPhaseNeedsQueueing",
       "nextPhaseNeedsQueueing(uint256):(bool)",
-      [ethereum.Value.fromUnsignedBigInt(_gameId)]
+      [ethereum.Value.fromUnsignedBigInt(_gameId)],
     );
 
     return result[0].toBoolean();
@@ -534,7 +676,7 @@ export class DefifaDeployer extends ethereum.SmartContract {
     let result = super.tryCall(
       "nextPhaseNeedsQueueing",
       "nextPhaseNeedsQueueing(uint256):(bool)",
-      [ethereum.Value.fromUnsignedBigInt(_gameId)]
+      [ethereum.Value.fromUnsignedBigInt(_gameId)],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -547,7 +689,7 @@ export class DefifaDeployer extends ethereum.SmartContract {
     param0: Address,
     param1: Address,
     param2: BigInt,
-    param3: Bytes
+    param3: Bytes,
   ): Bytes {
     let result = super.call(
       "onERC721Received",
@@ -556,8 +698,8 @@ export class DefifaDeployer extends ethereum.SmartContract {
         ethereum.Value.fromAddress(param0),
         ethereum.Value.fromAddress(param1),
         ethereum.Value.fromUnsignedBigInt(param2),
-        ethereum.Value.fromBytes(param3)
-      ]
+        ethereum.Value.fromBytes(param3),
+      ],
     );
 
     return result[0].toBytes();
@@ -567,7 +709,7 @@ export class DefifaDeployer extends ethereum.SmartContract {
     param0: Address,
     param1: Address,
     param2: BigInt,
-    param3: Bytes
+    param3: Bytes,
   ): ethereum.CallResult<Bytes> {
     let result = super.tryCall(
       "onERC721Received",
@@ -576,8 +718,8 @@ export class DefifaDeployer extends ethereum.SmartContract {
         ethereum.Value.fromAddress(param0),
         ethereum.Value.fromAddress(param1),
         ethereum.Value.fromUnsignedBigInt(param2),
-        ethereum.Value.fromBytes(param3)
-      ]
+        ethereum.Value.fromBytes(param3),
+      ],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -586,14 +728,14 @@ export class DefifaDeployer extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBytes());
   }
 
-  owner(): Address {
-    let result = super.call("owner", "owner():(address)", []);
+  registry(): Address {
+    let result = super.call("registry", "registry():(address)", []);
 
     return result[0].toAddress();
   }
 
-  try_owner(): ethereum.CallResult<Address> {
-    let result = super.tryCall("owner", "owner():(address)", []);
+  try_registry(): ethereum.CallResult<Address> {
+    let result = super.tryCall("registry", "registry():(address)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -601,45 +743,14 @@ export class DefifaDeployer extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  protocolFeeProjectTokenAccount(): Address {
-    let result = super.call(
-      "protocolFeeProjectTokenAccount",
-      "protocolFeeProjectTokenAccount():(address)",
-      []
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_protocolFeeProjectTokenAccount(): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "protocolFeeProjectTokenAccount",
-      "protocolFeeProjectTokenAccount():(address)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  queueNextPhaseOf(_gameId: BigInt): BigInt {
-    let result = super.call(
-      "queueNextPhaseOf",
-      "queueNextPhaseOf(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_gameId)]
-    );
+  splitGroup(): BigInt {
+    let result = super.call("splitGroup", "splitGroup():(uint256)", []);
 
     return result[0].toBigInt();
   }
 
-  try_queueNextPhaseOf(_gameId: BigInt): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "queueNextPhaseOf",
-      "queueNextPhaseOf(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_gameId)]
-    );
+  try_splitGroup(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("splitGroup", "splitGroup():(uint256)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -647,111 +758,75 @@ export class DefifaDeployer extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  refundPeriodDurationOf(_gameId: BigInt): BigInt {
-    let result = super.call(
-      "refundPeriodDurationOf",
-      "refundPeriodDurationOf(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_gameId)]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_refundPeriodDurationOf(_gameId: BigInt): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "refundPeriodDurationOf",
-      "refundPeriodDurationOf(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_gameId)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  startOf(_gameId: BigInt): BigInt {
-    let result = super.call("startOf", "startOf(uint256):(uint256)", [
-      ethereum.Value.fromUnsignedBigInt(_gameId)
-    ]);
-
-    return result[0].toBigInt();
-  }
-
-  try_startOf(_gameId: BigInt): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("startOf", "startOf(uint256):(uint256)", [
-      ethereum.Value.fromUnsignedBigInt(_gameId)
-    ]);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  terminalOf(_gameId: BigInt): Address {
-    let result = super.call("terminalOf", "terminalOf(uint256):(address)", [
-      ethereum.Value.fromUnsignedBigInt(_gameId)
-    ]);
-
-    return result[0].toAddress();
-  }
-
-  try_terminalOf(_gameId: BigInt): ethereum.CallResult<Address> {
-    let result = super.tryCall("terminalOf", "terminalOf(uint256):(address)", [
-      ethereum.Value.fromUnsignedBigInt(_gameId)
-    ]);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  timesFor(_gameId: BigInt): DefifaDeployer__timesForResultValue0Struct {
+  timesFor(_gameId: BigInt): DefifaDeployer__timesForResult {
     let result = super.call(
       "timesFor",
-      "timesFor(uint256):((uint48,uint48,uint48,uint48))",
-      [ethereum.Value.fromUnsignedBigInt(_gameId)]
+      "timesFor(uint256):(uint48,uint24,uint24)",
+      [ethereum.Value.fromUnsignedBigInt(_gameId)],
     );
 
-    return changetype<DefifaDeployer__timesForResultValue0Struct>(
-      result[0].toTuple()
+    return new DefifaDeployer__timesForResult(
+      result[0].toBigInt(),
+      result[1].toI32(),
+      result[2].toI32(),
     );
   }
 
   try_timesFor(
-    _gameId: BigInt
-  ): ethereum.CallResult<DefifaDeployer__timesForResultValue0Struct> {
+    _gameId: BigInt,
+  ): ethereum.CallResult<DefifaDeployer__timesForResult> {
     let result = super.tryCall(
       "timesFor",
-      "timesFor(uint256):((uint48,uint48,uint48,uint48))",
-      [ethereum.Value.fromUnsignedBigInt(_gameId)]
+      "timesFor(uint256):(uint48,uint24,uint24)",
+      [ethereum.Value.fromUnsignedBigInt(_gameId)],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      changetype<DefifaDeployer__timesForResultValue0Struct>(value[0].toTuple())
+      new DefifaDeployer__timesForResult(
+        value[0].toBigInt(),
+        value[1].toI32(),
+        value[2].toI32(),
+      ),
     );
   }
 
-  tokenUriResolverCodeOrigin(): Address {
+  tokenOf(_gameId: BigInt): Address {
+    let result = super.call("tokenOf", "tokenOf(uint256):(address)", [
+      ethereum.Value.fromUnsignedBigInt(_gameId),
+    ]);
+
+    return result[0].toAddress();
+  }
+
+  try_tokenOf(_gameId: BigInt): ethereum.CallResult<Address> {
+    let result = super.tryCall("tokenOf", "tokenOf(uint256):(address)", [
+      ethereum.Value.fromUnsignedBigInt(_gameId),
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  tokenUriResolver(): Address {
     let result = super.call(
-      "tokenUriResolverCodeOrigin",
-      "tokenUriResolverCodeOrigin():(address)",
-      []
+      "tokenUriResolver",
+      "tokenUriResolver():(address)",
+      [],
     );
 
     return result[0].toAddress();
   }
 
-  try_tokenUriResolverCodeOrigin(): ethereum.CallResult<Address> {
+  try_tokenUriResolver(): ethereum.CallResult<Address> {
     let result = super.tryCall(
-      "tokenUriResolverCodeOrigin",
-      "tokenUriResolverCodeOrigin():(address)",
-      []
+      "tokenUriResolver",
+      "tokenUriResolver():(address)",
+      [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -782,11 +857,11 @@ export class ConstructorCall__Inputs {
     return this._call.inputValues[0].value.toAddress();
   }
 
-  get _governorCodeOrigin(): Address {
+  get _tokenUriResolver(): Address {
     return this._call.inputValues[1].value.toAddress();
   }
 
-  get _tokenUriResolverCodeOrigin(): Address {
+  get _governor(): Address {
     return this._call.inputValues[2].value.toAddress();
   }
 
@@ -794,20 +869,16 @@ export class ConstructorCall__Inputs {
     return this._call.inputValues[3].value.toAddress();
   }
 
-  get _delegatesRegistry(): Address {
+  get _registry(): Address {
     return this._call.inputValues[4].value.toAddress();
   }
 
-  get _protocolFeeProjectTokenAccount(): Address {
-    return this._call.inputValues[5].value.toAddress();
+  get _defifaProjectId(): BigInt {
+    return this._call.inputValues[5].value.toBigInt();
   }
 
-  get _ballkidzProjectId(): BigInt {
+  get _baseProtocolProjectId(): BigInt {
     return this._call.inputValues[6].value.toBigInt();
-  }
-
-  get _owner(): Address {
-    return this._call.inputValues[7].value.toAddress();
   }
 }
 
@@ -819,58 +890,32 @@ export class ConstructorCall__Outputs {
   }
 }
 
-export class ChangeFeeCall extends ethereum.Call {
-  get inputs(): ChangeFeeCall__Inputs {
-    return new ChangeFeeCall__Inputs(this);
+export class FulfillCommitmentsOfCall extends ethereum.Call {
+  get inputs(): FulfillCommitmentsOfCall__Inputs {
+    return new FulfillCommitmentsOfCall__Inputs(this);
   }
 
-  get outputs(): ChangeFeeCall__Outputs {
-    return new ChangeFeeCall__Outputs(this);
+  get outputs(): FulfillCommitmentsOfCall__Outputs {
+    return new FulfillCommitmentsOfCall__Outputs(this);
   }
 }
 
-export class ChangeFeeCall__Inputs {
-  _call: ChangeFeeCall;
+export class FulfillCommitmentsOfCall__Inputs {
+  _call: FulfillCommitmentsOfCall;
 
-  constructor(call: ChangeFeeCall) {
+  constructor(call: FulfillCommitmentsOfCall) {
     this._call = call;
   }
 
-  get _percent(): BigInt {
+  get _gameId(): BigInt {
     return this._call.inputValues[0].value.toBigInt();
   }
 }
 
-export class ChangeFeeCall__Outputs {
-  _call: ChangeFeeCall;
+export class FulfillCommitmentsOfCall__Outputs {
+  _call: FulfillCommitmentsOfCall;
 
-  constructor(call: ChangeFeeCall) {
-    this._call = call;
-  }
-}
-
-export class ClaimProtocolProjectTokenCall extends ethereum.Call {
-  get inputs(): ClaimProtocolProjectTokenCall__Inputs {
-    return new ClaimProtocolProjectTokenCall__Inputs(this);
-  }
-
-  get outputs(): ClaimProtocolProjectTokenCall__Outputs {
-    return new ClaimProtocolProjectTokenCall__Outputs(this);
-  }
-}
-
-export class ClaimProtocolProjectTokenCall__Inputs {
-  _call: ClaimProtocolProjectTokenCall;
-
-  constructor(call: ClaimProtocolProjectTokenCall) {
-    this._call = call;
-  }
-}
-
-export class ClaimProtocolProjectTokenCall__Outputs {
-  _call: ClaimProtocolProjectTokenCall;
-
-  constructor(call: ClaimProtocolProjectTokenCall) {
+  constructor(call: FulfillCommitmentsOfCall) {
     this._call = call;
   }
 }
@@ -894,7 +939,7 @@ export class LaunchGameWithCall__Inputs {
 
   get _launchProjectData(): LaunchGameWithCall_launchProjectDataStruct {
     return changetype<LaunchGameWithCall_launchProjectDataStruct>(
-      this._call.inputValues[0].value.toTuple()
+      this._call.inputValues[0].value.toTuple(),
     );
   }
 }
@@ -909,10 +954,6 @@ export class LaunchGameWithCall__Outputs {
   get gameId(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
   }
-
-  get governor(): Address {
-    return this._call.outputValues[1].value.toAddress();
-  }
 }
 
 export class LaunchGameWithCall_launchProjectDataStruct extends ethereum.Tuple {
@@ -920,10 +961,8 @@ export class LaunchGameWithCall_launchProjectDataStruct extends ethereum.Tuple {
     return this[0].toString();
   }
 
-  get projectMetadata(): LaunchGameWithCall_launchProjectDataProjectMetadataStruct {
-    return changetype<
-      LaunchGameWithCall_launchProjectDataProjectMetadataStruct
-    >(this[1].toTuple());
+  get projectUri(): string {
+    return this[1].toString();
   }
 
   get contractUri(): string {
@@ -935,214 +974,118 @@ export class LaunchGameWithCall_launchProjectDataStruct extends ethereum.Tuple {
   }
 
   get tiers(): Array<LaunchGameWithCall_launchProjectDataTiersStruct> {
-    return this[4].toTupleArray<
-      LaunchGameWithCall_launchProjectDataTiersStruct
-    >();
+    return this[4].toTupleArray<LaunchGameWithCall_launchProjectDataTiersStruct>();
   }
 
-  get token(): Address {
-    return this[5].toAddress();
+  get token(): LaunchGameWithCall_launchProjectDataTokenStruct {
+    return changetype<LaunchGameWithCall_launchProjectDataTokenStruct>(
+      this[5].toTuple(),
+    );
   }
 
-  get mintDuration(): BigInt {
-    return this[6].toBigInt();
+  get mintPeriodDuration(): i32 {
+    return this[6].toI32();
   }
 
-  get refundPeriodDuration(): BigInt {
-    return this[7].toBigInt();
+  get refundPeriodDuration(): i32 {
+    return this[7].toI32();
   }
 
   get start(): BigInt {
     return this[8].toBigInt();
   }
 
-  get end(): BigInt {
-    return this[9].toBigInt();
-  }
-
   get splits(): Array<LaunchGameWithCall_launchProjectDataSplitsStruct> {
-    return this[10].toTupleArray<
-      LaunchGameWithCall_launchProjectDataSplitsStruct
-    >();
+    return this[9].toTupleArray<LaunchGameWithCall_launchProjectDataSplitsStruct>();
   }
 
-  get distributionLimit(): BigInt {
+  get attestationStartTime(): BigInt {
+    return this[10].toBigInt();
+  }
+
+  get attestationGracePeriod(): BigInt {
     return this[11].toBigInt();
   }
 
-  get ballkidzFeeProjectTokenAccount(): Address {
+  get defaultAttestationDelegate(): Address {
     return this[12].toAddress();
   }
 
-  get votingPeriod(): BigInt {
-    return this[13].toBigInt();
-  }
-
   get defaultTokenUriResolver(): Address {
-    return this[14].toAddress();
+    return this[13].toAddress();
   }
 
   get terminal(): Address {
-    return this[15].toAddress();
+    return this[14].toAddress();
   }
 
   get store(): Address {
-    return this[16].toAddress();
-  }
-}
-
-export class LaunchGameWithCall_launchProjectDataProjectMetadataStruct extends ethereum.Tuple {
-  get content(): string {
-    return this[0].toString();
-  }
-
-  get domain(): BigInt {
-    return this[1].toBigInt();
+    return this[15].toAddress();
   }
 }
 
 export class LaunchGameWithCall_launchProjectDataTiersStruct extends ethereum.Tuple {
+  get name(): string {
+    return this[0].toString();
+  }
+
   get price(): BigInt {
-    return this[0].toBigInt();
+    return this[1].toBigInt();
   }
 
   get reservedRate(): i32 {
-    return this[1].toI32();
+    return this[2].toI32();
   }
 
   get reservedTokenBeneficiary(): Address {
-    return this[2].toAddress();
+    return this[3].toAddress();
   }
 
   get encodedIPFSUri(): Bytes {
-    return this[3].toBytes();
+    return this[4].toBytes();
   }
 
   get shouldUseReservedTokenBeneficiaryAsDefault(): boolean {
-    return this[4].toBoolean();
+    return this[5].toBoolean();
+  }
+}
+
+export class LaunchGameWithCall_launchProjectDataTokenStruct extends ethereum.Tuple {
+  get token(): Address {
+    return this[0].toAddress();
   }
 
-  get name(): string {
-    return this[5].toString();
+  get decimals(): i32 {
+    return this[1].toI32();
+  }
+
+  get currency(): BigInt {
+    return this[2].toBigInt();
   }
 }
 
 export class LaunchGameWithCall_launchProjectDataSplitsStruct extends ethereum.Tuple {
-  get preferClaimed(): boolean {
-    return this[0].toBoolean();
-  }
-
-  get preferAddToBalance(): boolean {
-    return this[1].toBoolean();
-  }
-
   get percent(): BigInt {
-    return this[2].toBigInt();
+    return this[0].toBigInt();
   }
 
   get projectId(): BigInt {
-    return this[3].toBigInt();
+    return this[1].toBigInt();
   }
 
   get beneficiary(): Address {
-    return this[4].toAddress();
+    return this[2].toAddress();
+  }
+
+  get preferAddToBalance(): boolean {
+    return this[3].toBoolean();
   }
 
   get lockedUntil(): BigInt {
-    return this[5].toBigInt();
+    return this[4].toBigInt();
   }
 
-  get allocator(): Address {
-    return this[6].toAddress();
-  }
-}
-
-export class QueueNextPhaseOfCall extends ethereum.Call {
-  get inputs(): QueueNextPhaseOfCall__Inputs {
-    return new QueueNextPhaseOfCall__Inputs(this);
-  }
-
-  get outputs(): QueueNextPhaseOfCall__Outputs {
-    return new QueueNextPhaseOfCall__Outputs(this);
-  }
-}
-
-export class QueueNextPhaseOfCall__Inputs {
-  _call: QueueNextPhaseOfCall;
-
-  constructor(call: QueueNextPhaseOfCall) {
-    this._call = call;
-  }
-
-  get _gameId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-}
-
-export class QueueNextPhaseOfCall__Outputs {
-  _call: QueueNextPhaseOfCall;
-
-  constructor(call: QueueNextPhaseOfCall) {
-    this._call = call;
-  }
-
-  get configuration(): BigInt {
-    return this._call.outputValues[0].value.toBigInt();
-  }
-}
-
-export class RenounceOwnershipCall extends ethereum.Call {
-  get inputs(): RenounceOwnershipCall__Inputs {
-    return new RenounceOwnershipCall__Inputs(this);
-  }
-
-  get outputs(): RenounceOwnershipCall__Outputs {
-    return new RenounceOwnershipCall__Outputs(this);
-  }
-}
-
-export class RenounceOwnershipCall__Inputs {
-  _call: RenounceOwnershipCall;
-
-  constructor(call: RenounceOwnershipCall) {
-    this._call = call;
-  }
-}
-
-export class RenounceOwnershipCall__Outputs {
-  _call: RenounceOwnershipCall;
-
-  constructor(call: RenounceOwnershipCall) {
-    this._call = call;
-  }
-}
-
-export class TransferOwnershipCall extends ethereum.Call {
-  get inputs(): TransferOwnershipCall__Inputs {
-    return new TransferOwnershipCall__Inputs(this);
-  }
-
-  get outputs(): TransferOwnershipCall__Outputs {
-    return new TransferOwnershipCall__Outputs(this);
-  }
-}
-
-export class TransferOwnershipCall__Inputs {
-  _call: TransferOwnershipCall;
-
-  constructor(call: TransferOwnershipCall) {
-    this._call = call;
-  }
-
-  get newOwner(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-}
-
-export class TransferOwnershipCall__Outputs {
-  _call: TransferOwnershipCall;
-
-  constructor(call: TransferOwnershipCall) {
-    this._call = call;
+  get hook(): Address {
+    return this[5].toAddress();
   }
 }

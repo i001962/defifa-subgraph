@@ -8,7 +8,7 @@ type Transfer @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type Token @entity {
+type Token @entity(immutable: false) {
   id: ID!
   owner: Owner!
   uri: String
@@ -18,7 +18,7 @@ type Token @entity {
   contract: Contract!
 }
 
-type TokenMetadata @entity {
+type TokenMetadata @entity(immutable: false) {
   id: ID!
   token: Token!
   name: String
@@ -28,13 +28,13 @@ type TokenMetadata @entity {
   image: String
 }
 
-type Owner @entity {
+type Owner @entity(immutable: false) {
   id: ID!
   ownedTokens: [Token!]! @derivedFrom(field: "owner")
   balance: BigInt!
 }
 
-type Contract @entity {
+type Contract @entity(immutable: false) {
   id: Bytes!
   address: Bytes!
   gameId: BigInt!
@@ -47,7 +47,7 @@ type Contract @entity {
   mintedTokens: [Token!]! @derivedFrom(field: "contract")
 }
 
-type Account @entity {
+type Account @entity(immutable: false) {
   id: Bytes!
   asGovernor: Governor
   proposed: [Proposal!]! @derivedFrom(field: "proposer")
@@ -56,7 +56,7 @@ type Account @entity {
   events: [Event!]! @derivedFrom(field: "emitter")
 }
 
-type Governor @entity(immutable: true) {
+type Governor @entity(immutable: false) {
   id: Bytes!
   asAccount: Account!
   defifaContract: Contract!
@@ -69,7 +69,7 @@ type Governor @entity(immutable: true) {
   votecast: [VoteCast!]! @derivedFrom(field: "governor")
 }
 
-type Proposal @entity {
+type Proposal @entity(immutable: false) {
   id: ID!
   governor: Governor!
   proposalId: BigInt!
@@ -101,7 +101,7 @@ type ProposalCall @entity(immutable: true) {
   calldata: Bytes!
 }
 
-type ProposalSupport @entity {
+type ProposalSupport @entity(immutable: false) {
   id: ID!
   proposal: Proposal!
   support: Int!
@@ -182,3 +182,27 @@ type Transaction @entity(immutable: true) {
   blockNumber: BigInt!
   events: [Event!]! @derivedFrom(field: "transaction")
 }
+
+# Scorecard entities
+type Scorecard @entity(immutable: false) {
+  id: ID!
+  gameId: BigInt!
+  scorecardId: BigInt!
+  submitter: Account!
+  tierWeights: [TierWeight!]! @derivedFrom(field: "scorecard")
+  isDefaultAttestationDelegate: Boolean!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+  ratified: Boolean
+  ratifiedAt: BigInt
+  ratifiedBy: Account
+}
+
+type TierWeight @entity(immutable: true) {
+  id: ID!
+  scorecard: Scorecard!
+  tierId: BigInt!
+  redemptionWeight: BigInt!
+}
+

@@ -1,7 +1,7 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
-description: 0.2.0
+description: Defifa Subgraph for Base Sepolia Network
 dataSources:
   - kind: ethereum
     name: DefifaDeployer

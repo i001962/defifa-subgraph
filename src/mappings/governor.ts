@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts"
+import { Address, BigInt, BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts"
 
 import {
   Account,
@@ -12,8 +12,17 @@ import {
   ProposalExecuted,
   ProposalCanceled,
   Transaction,
-  VoteCast
+  VoteCast,
+  Scorecard,
+  TierWeight
 } from "../../generated/schema"
+
+import {
+  GameInitialized as GameInitializedEvent,
+  ScorecardSubmitted as ScorecardSubmittedEvent,
+  ScorecardAttested as ScorecardAttestedEvent,
+  ScorecardRatified as ScorecardRatifiedEvent
+} from "../../generated/templates/Governor/DefifaGovernor"
 
 import {
   ProposalCreated as ProposalCreatedEvent,
@@ -25,7 +34,59 @@ import {
   Governor as GovernorContract
 } from "../../generated/templates/Governor/Governor"
 
-import { constants, decimals } from "@amxx/graphprotocol-utils"
+// Helper constants (replacing deprecated @amxx/graphprotocol-utils)
+const BIGINT_ZERO = BigInt.fromI32(0)
+const BIGDECIMAL_ZERO = BigDecimal.fromString("0")
+
+// Helper function to convert BigInt to BigDecimal with 18 decimals
+function toDecimals(value: BigInt): BigDecimal {
+  return value.toBigDecimal().div(BigDecimal.fromString("1000000000000000000"))
+}
+
+export function handleGameInitialized(event: GameInitializedEvent): void {
+  // Game initialization event
+  // Parameters:
+  // - gameId: uint256 (indexed)
+  // - attestationStartTime: uint256
+  // - attestationGracePeriod: uint256
+  // - caller: address
+  
+  // For now, this is a stub handler to allow the subgraph to sync
+  // The Governor entity is already created in the LaunchGame handler
+  // This event just signals that the game's attestation phase has been initialized
+}
+
+export function handleScorecardSubmitted(event: ScorecardSubmittedEvent): void {
+  // Create scorecard entity
+  let scorecardId = event.params.gameId.toString() + "-" + event.params.scorecardId.toString()
+  let scorecard = new Scorecard(scorecardId)
+  
+  scorecard.gameId = event.params.gameId
+  scorecard.scorecardId = event.params.scorecardId
+  scorecard.submitter = fetchAccount(event.params.caller).id
+  scorecard.isDefaultAttestationDelegate = event.params.isDefaultAttestationDelegate
+  scorecard.timestamp = event.block.timestamp
+  scorecard.blockNumber = event.block.number
+  scorecard.transactionHash = event.transaction.hash
+  scorecard.ratified = false
+  scorecard.ratifiedAt = null
+  scorecard.ratifiedBy = null
+  
+  scorecard.save()
+  
+  // Create tier weight entities
+  let tierWeights = event.params.tierWeights
+  for (let i = 0; i < tierWeights.length; i++) {
+    let tierWeightId = scorecardId + "-" + i.toString()
+    let tierWeight = new TierWeight(tierWeightId)
+    
+    tierWeight.scorecard = scorecardId
+    tierWeight.tierId = tierWeights[i].id
+    tierWeight.redemptionWeight = tierWeights[i].cashOutWeight
+    
+    tierWeight.save()
+  }
+}
 
 export function handleProposalCreated(event: ProposalCreatedEvent): void {
   let governor = fetchGovernor(event.address)
@@ -54,8 +115,8 @@ export function handleProposalCreated(event: ProposalCreatedEvent): void {
     call.target = fetchAccount(targets[i]).id
     call.value =
       i < values.length
-        ? decimals.toDecimals(values[i])
-        : constants.BIGDECIMAL_ZERO
+        ? toDecimals(values[i])
+        : BIGDECIMAL_ZERO
     call.signature = i < signatures.length ? signatures[i] : ""
     call.calldata = i < calldatas.length ? calldatas[i] : Bytes.empty()
     call.save()
@@ -153,7 +214,7 @@ export function handleVoteCast(event: VoteCastEvent): void {
     support = new ProposalSupport(id)
     support.proposal = proposal.id
     support.support = event.params.support
-    support.weight = constants.BIGINT_ZERO
+    support.weight = BIGINT_ZERO
   }
 
   support.weight = support.weight.plus(event.params.weight)
@@ -194,7 +255,7 @@ export function handleVoteCastWithParams(event: VoteCastWithParamsEvent): void {
     support = new ProposalSupport(id)
     support.proposal = proposal.id
     support.support = event.params.support
-    support.weight = constants.BIGINT_ZERO
+    support.weight = BIGINT_ZERO
   }
 
   support.weight = support.weight.plus(event.params.weight)
@@ -293,6 +354,38 @@ export function fetchVoteReceipt(
   }
 
   return receipt as VoteReceipt
+}
+
+export function handleScorecardAttested(event: ScorecardAttestedEvent): void {
+  // Handle scorecard attestation (voting) event
+  // Parameters:
+  // - gameId: uint256 (indexed)
+  // - scorecardId: uint256 (indexed) 
+  // - weight: uint256 (voting weight)
+  // - caller: address (voter)
+  
+  // For now, this is a stub handler to allow the subgraph to sync
+  // In the future, we could track individual votes/attestations here
+  // The vote counts are already tracked via the contract's attestationCountOf function
+}
+
+export function handleScorecardRatified(event: ScorecardRatifiedEvent): void {
+  // Handle scorecard ratification (locking) event
+  // Parameters:
+  // - gameId: uint256 (indexed)
+  // - scorecardId: uint256 (indexed)
+  // - caller: address (ratifier)
+  
+  // Update the scorecard to mark it as ratified
+  let scorecardId = event.params.gameId.toString() + "-" + event.params.scorecardId.toString()
+  let scorecard = Scorecard.load(scorecardId)
+  
+  if (scorecard != null) {
+    scorecard.ratified = true
+    scorecard.ratifiedAt = event.block.timestamp
+    scorecard.ratifiedBy = fetchAccount(event.params.caller).id
+    scorecard.save()
+  }
 }
 
 export function logTransaction(event: ethereum.Event): Transaction {
