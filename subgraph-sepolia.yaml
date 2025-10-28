@@ -35,9 +35,10 @@ dataSources:
         - event: FulfilledCommitments(indexed uint256,uint256,address)
           handler: handleFulfilledCommitments
       file: ./src/mappings/defifa-deployer.ts
+
 templates:
-  - name: DefifaNFT
-    kind: ethereum/contract
+  - kind: ethereum
+    name: DefifaNFT
     network: sepolia
     source:
       abi: DefifaNFT
@@ -45,13 +46,11 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      file: ./src/mappings/defifa-nft.ts
       entities:
+        - Transfer
+        - Owner
         - Token
         - TokenMetadata
-        - Owner
-        - Transfer
-        - Contract
       abis:
         - name: DefifaNFT
           file: ./abis/DefifaNFT.json
@@ -64,8 +63,10 @@ templates:
           handler: handleMintReservedToken
         - event: TierDelegateAttestationsChanged(indexed address,indexed uint256,uint256,uint256,address)
           handler: handleTierDelegateAttestationsChanged
-  - name: Governor
-    kind: ethereum/contract
+      file: ./src/mappings/defifa-nft.ts
+
+  - kind: ethereum
+    name: Governor
     network: sepolia
     source:
       abi: DefifaGovernor
@@ -73,31 +74,18 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      file: ./src/mappings/governor.ts
       entities:
-        - Governor
+        - Account
+        - Scorecard
+        - DefifaTierRedemptionWeight
       abis:
         - name: DefifaGovernor
           file: ./abis/DefifaGovernor.json
       eventHandlers:
-        - event: GameInitialized(indexed uint256,uint256,uint256,address)
-          handler: handleGameInitialized
         - event: ScorecardSubmitted(indexed uint256,indexed uint256,(uint256,uint256)[],bool,address)
           handler: handleScorecardSubmitted
         - event: ScorecardAttested(indexed uint256,indexed uint256,uint256,address)
           handler: handleScorecardAttested
         - event: ScorecardRatified(indexed uint256,indexed uint256,address)
           handler: handleScorecardRatified
-  - name: TokenMetadata
-    kind: file/ipfs
-    network: sepolia
-    mapping:
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      file: ./src/mappings/metadata.ts
-      handler: handleMetadata
-      entities:
-        - TokenMetadata
-      abis:
-        - name: DefifaNFT
-          file: ./abis/DefifaNFT.json
+      file: ./src/mappings/governor.ts

@@ -47,59 +47,42 @@ VERSION_LABEL=$2
 
 print_status "Deploying subgraph for $CHAIN with version $VERSION_LABEL..."
 
-# Check if deployment artifacts exist
-DEPLOYER_PATH="../defifa-collection-deployer-v5/deployments/defifa-v5/$CHAIN/DefifaDeployer.json"
-if [ ! -f "$DEPLOYER_PATH" ]; then
-    print_error "Deployment artifacts not found for $CHAIN at $DEPLOYER_PATH"
+# Check if ABIs exist (assume they are manually placed)
+if [ ! -f "abis/DefifaDeployer.json" ] || [ ! -f "abis/DefifaNFT.json" ] || [ ! -f "abis/DefifaGovernor.json" ]; then
+    print_error "Required ABIs not found in abis/ directory. Please ensure the following files exist:"
+    print_error "  - abis/DefifaDeployer.json"
+    print_error "  - abis/DefifaNFT.json (DefifaDelegate ABI)"
+    print_error "  - abis/DefifaGovernor.json"
     exit 1
 fi
 
-# Extract contract address and deployment block
-DEPLOYER_ADDRESS=$(jq -r '.address' "$DEPLOYER_PATH")
-DEPLOYMENT_BLOCK=$(jq -r '.receipt.blockNumber' "$DEPLOYER_PATH" | sed 's/0x//' | xargs -I {} printf "%d\n" 0x{})
-
-# Use a safer start block for Arbitrum Sepolia if the deployment block is too high
-if [ "$CHAIN" = "arbitrum_sepolia" ] && [ "$DEPLOYMENT_BLOCK" -gt 100000000 ]; then
-    DEPLOYMENT_BLOCK=1000000
-    print_warning "Using safer start block $DEPLOYMENT_BLOCK for Arbitrum Sepolia"
+# Determine which subgraph config to use
+# Convert underscores to hyphens for filename matching
+CHAIN_FILENAME=$(echo "$CHAIN" | sed 's/_/-/g')
+SUBGRAPH_CONFIG="subgraph-$CHAIN_FILENAME.yaml"
+if [ ! -f "$SUBGRAPH_CONFIG" ]; then
+    print_error "Subgraph configuration not found: $SUBGRAPH_CONFIG"
+    print_error "Available configs:"
+    ls -1 subgraph-*.yaml 2>/dev/null || print_error "  No subgraph configs found"
+    exit 1
 fi
 
-print_status "Using DefifaDeployer address: $DEPLOYER_ADDRESS"
-print_status "Using start block: $DEPLOYMENT_BLOCK"
-
-# Backup original subgraph.yaml
-cp subgraph.yaml subgraph.yaml.backup
-
-# Update the subgraph.yaml file
-sed -i.tmp "s/network: sepolia/network: $CHAIN/" subgraph.yaml
-sed -i.tmp "s/address: \".*\"/address: \"$DEPLOYER_ADDRESS\"/" subgraph.yaml
-sed -i.tmp "s/startBlock: [0-9]*/startBlock: $DEPLOYMENT_BLOCK/" subgraph.yaml
-
-# Copy updated ABIs
-print_status "Copying ABIs for $CHAIN..."
-cp "../defifa-collection-deployer-v5/deployments/defifa-v5/$CHAIN/DefifaDeployer.json" abis/DefifaDeployer.json
-cp "../defifa-collection-deployer-v5/deployments/defifa-v5/$CHAIN/DefifaDelegate.json" abis/DefifaNFT.json
-cp "../defifa-collection-deployer-v5/deployments/defifa-v5/$CHAIN/DefifaGovernor.json" abis/DefifaGovernor.json
+print_status "Using subgraph configuration: $SUBGRAPH_CONFIG"
 
 # Generate types
 print_status "Generating types for $CHAIN..."
-npm run codegen
+graph codegen "$SUBGRAPH_CONFIG"
 
 # Build subgraph
 print_status "Building subgraph for $CHAIN..."
-npm run build
+graph build "$SUBGRAPH_CONFIG"
 
-# Deploy subgraph
+# Deploy subgraph using the chain-specific config
 print_status "Deploying subgraph for $CHAIN..."
 
-# Skip create step - subgraph already exists in Graph Studio
 # Convert underscores to hyphens for Graph Studio naming convention
 SUBGRAPH_NAME=$(echo "defifa-$CHAIN" | sed 's/_/-/g')
-graph deploy --node https://api.studio.thegraph.com/deploy/ "$SUBGRAPH_NAME" --version-label "$VERSION_LABEL"
-
-# Restore original subgraph.yaml
-mv subgraph.yaml.backup subgraph.yaml
-rm -f subgraph.yaml.tmp
+graph deploy --node https://api.studio.thegraph.com/deploy/ "$SUBGRAPH_NAME" --version-label "$VERSION_LABEL" "$SUBGRAPH_CONFIG"
 
 print_success "Successfully deployed subgraph for $CHAIN!"
 print_status "Subgraph endpoint: https://api.studio.thegraph.com/query/107226/$SUBGRAPH_NAME/$VERSION_LABEL"

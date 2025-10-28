@@ -36,22 +36,19 @@ deploy_chain() {
     
     print_status "Deploying subgraph for $chain..."
     
-    # Check if deployment artifacts exist
-    local deployer_path="../defifa-collection-deployer-v5/deployments/defifa-v5/$chain/DefifaDeployer.json"
-    if [ ! -f "$deployer_path" ]; then
-        print_error "Deployment artifacts not found for $chain at $deployer_path"
+    # Check if ABIs exist (assume they are manually placed)
+    if [ ! -f "abis/DefifaDeployer.json" ] || [ ! -f "abis/DefifaNFT.json" ] || [ ! -f "abis/DefifaGovernor.json" ]; then
+        print_error "Required ABIs not found in abis/ directory. Please ensure the following files exist:"
+        print_error "  - abis/DefifaDeployer.json"
+        print_error "  - abis/DefifaNFT.json (DefifaDelegate ABI)"
+        print_error "  - abis/DefifaGovernor.json"
         return 1
     fi
     
-    # Extract contract address and deployment block
-    local deployer_address=$(jq -r '.address' "$deployer_path")
-    local deployment_block=$(jq -r '.receipt.blockNumber' "$deployer_path" | sed 's/0x//' | xargs -I {} printf "%d\n" 0x{})
-    
-    print_status "Using DefifaDeployer address: $deployer_address"
-    print_status "Using start block: $deployment_block"
-    
     # Determine which subgraph config to use
-    local subgraph_config="subgraph-$chain.yaml"
+    # Convert underscores to hyphens for filename matching
+    local chain_filename=$(echo "$chain" | sed 's/_/-/g')
+    local subgraph_config="subgraph-$chain_filename.yaml"
     if [ ! -f "$subgraph_config" ]; then
         print_error "Subgraph configuration not found: $subgraph_config"
         return 1
@@ -59,18 +56,13 @@ deploy_chain() {
     
     print_status "Using subgraph configuration: $subgraph_config"
     
-    # Copy updated ABIs
-    cp "../defifa-collection-deployer-v5/deployments/defifa-v5/$chain/DefifaDeployer.json" abis/DefifaDeployer.json
-    cp "../defifa-collection-deployer-v5/deployments/defifa-v5/$chain/DefifaDelegate.json" abis/DefifaNFT.json
-    cp "../defifa-collection-deployer-v5/deployments/defifa-v5/$chain/DefifaGovernor.json" abis/DefifaGovernor.json
-    
     # Generate types
     print_status "Generating types for $chain..."
-    npm run codegen
+    graph codegen "$subgraph_config"
     
     # Build subgraph
     print_status "Building subgraph for $chain..."
-    npm run build
+    graph build "$subgraph_config"
     
     # Deploy subgraph using the chain-specific config
     print_status "Deploying subgraph for $chain with version $version_label..."
@@ -86,14 +78,17 @@ main() {
     echo ""
     
     # Check if we're in the right directory
-    if [ ! -f "subgraph.yaml" ]; then
-        print_error "subgraph.yaml not found. Please run this script from the defifa-subgraph directory."
+    if [ ! -d "abis" ] || [ ! -f "schema.graphql" ]; then
+        print_error "Not in the defifa-subgraph directory. Please run this script from the defifa-subgraph directory."
         exit 1
     fi
     
-    # Check if deployment artifacts exist
-    if [ ! -d "../defifa-collection-deployer-v5/deployments" ]; then
-        print_error "Deployment artifacts not found. Please ensure defifa-collection-deployer-v5 is in the parent directory."
+    # Check if ABIs exist (assume they are manually placed)
+    if [ ! -f "abis/DefifaDeployer.json" ] || [ ! -f "abis/DefifaNFT.json" ] || [ ! -f "abis/DefifaGovernor.json" ]; then
+        print_error "Required ABIs not found in abis/ directory. Please ensure the following files exist:"
+        print_error "  - abis/DefifaDeployer.json"
+        print_error "  - abis/DefifaNFT.json (DefifaDelegate ABI)"
+        print_error "  - abis/DefifaGovernor.json"
         exit 1
     fi
     

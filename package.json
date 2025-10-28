@@ -1,18 +1,12 @@
 {
-  "name": "defifa-sepolia",
+  "name": "defifa-subgraph",
   "license": "UNLICENSED",
   "scripts": {
-    "codegen": "graph codegen",
-    "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ defifa-sepolia",
     "deploy-all": "./deploy-all-chains.sh",
-    "deploy-chain": "./deploy-single-chain.sh",
-    "create-local": "graph create --node http://localhost:8020/ defifa-sepolia",
-    "remove-local": "graph remove --node http://localhost:8020/ defifa-sepolia",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 defifa-sepolia"
+    "deploy-chain": "./deploy-single-chain.sh"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "^0.82.0",
+    "@graphprotocol/graph-cli": "^0.97.1",
     "@graphprotocol/graph-ts": "^0.32.0",
     "as-base64": "^0.2.0"
   }
